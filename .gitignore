@@ -1,0 +1,8 @@
+
+frontend/public/*
+backend/*.mp4
+
+/storage/*
+backend.zip
+/output/*
+/backend/mmsegmentation/checkpoints/*
