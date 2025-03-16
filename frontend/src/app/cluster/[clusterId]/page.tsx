@@ -1,7 +1,6 @@
 // app/clusters/[clusterId]/versions/page.tsx
 import VersionItem from '@/components/version/version_item'
 import prisma from '@/libs/prisma'
-import { PrismaClient } from '@prisma/client'
 import { notFound } from 'next/navigation'
 
 interface PageProps {
@@ -9,7 +8,7 @@ interface PageProps {
 }
 
 export default async function ClusterVersionsPage({ params }: PageProps) {
-    const { clusterId } = await params;
+    const { clusterId } = await params
     const clusterVersions = await prisma.clusters.findUnique({
         where: { 
             id: clusterId,

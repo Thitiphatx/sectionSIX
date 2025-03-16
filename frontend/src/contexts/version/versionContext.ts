@@ -11,7 +11,9 @@ type VersionContextProps = {
     setLoadVideo: Dispatch<SetStateAction<boolean>>;
     showLabel: boolean;
     setShowLabel: Dispatch<SetStateAction<boolean>>;
-    address: string
+    address: string,
+    videoSrc: string
+    setVideoSrc: Dispatch<SetStateAction<string>>;
 }
 
 export const VersionContext = createContext<VersionContextProps | undefined>(undefined);

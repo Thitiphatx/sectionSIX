@@ -37,7 +37,7 @@ export default function Player2({ url }: { url: string | null }) {
 
 	return (
 		<div className="w-full">
-			<View360 className="is-16by9" projection={projection} plugins={[controlBar]} />
+			<View360 className="is-16by9" projection={projection}  plugins={[controlBar]} />
 		</div>
 	);
 }

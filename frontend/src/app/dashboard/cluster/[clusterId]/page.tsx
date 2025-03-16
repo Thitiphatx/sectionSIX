@@ -7,7 +7,11 @@ export default async function page({ params }: { params: Promise<{ clusterId: st
     const data = await prisma.clusters.findFirst({
         where: { id: clusterId },
         include: {
-            ClusterVersions: true
+            ClusterVersions: {
+                include: {
+                    Images: true
+                }
+            }
         }
     })
 

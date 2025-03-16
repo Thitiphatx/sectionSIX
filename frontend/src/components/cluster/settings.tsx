@@ -1,9 +1,6 @@
 "use client";
 
 import { useVersionContext } from "@/contexts/version/versionContext";
-import { revalidate_path } from "@/features/revalidatePath";
-import { objectClasses } from "@/types/classes";
-import { revalidatePath } from "next/cache";
 import { useRouter } from "next/navigation";
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
@@ -12,14 +9,16 @@ import { ProgressBar } from "primereact/progressbar";
 import { Toast } from "primereact/toast";
 import { ToggleButton } from "primereact/togglebutton";
 import { useEffect, useRef, useState } from "react";
+import { objectClasses } from "@/types/classes";
 
 export default function Settings() {
-    const { data, setClassList, setLoadVideo, setShowLabel } = useVersionContext();
-
+    const { data, setClassList, setLoadVideo, setShowLabel, showLabel, setVideoSrc } = useVersionContext();
     const toast = useRef<any>(null);
+    const router = useRouter();
+
     // State for available classes
-    const [availableClass, setAvailableClass] = useState<number[]>([]);
-    const [selectedClass, setSelectedClass] = useState<number[]>([]);
+    const [availableClasses, setAvailableClasses] = useState<number[]>([]);
+    const [selectedClasses, setSelectedClasses] = useState<number[]>([]);
     // State for MultiSelect options
     const [options, setOptions] = useState<{ label: string; value: string }[]>([]);
     const [renderProgress, setRenderProgress] = useState(0);
@@ -27,51 +26,52 @@ export default function Settings() {
     const [currentImage, setCurrentImage] = useState('');
     // State for loading status
     const [isLoading, setIsLoading] = useState(false);
+    // State for showing object labels
+    const [showObjectLabels, setShowObjectLabels] = useState(true);
+
     // Load available classes first
     useEffect(() => {
         if (data?.classes) {
             try {
                 const classes: number[] = JSON.parse(data.classes.toString());
-                setAvailableClass(classes);
+                console.log("Found in video", classes);
+                setAvailableClasses(classes);
             } catch (error) {
                 console.error("Error parsing classes:", error);
-                setAvailableClass([]);
+                setAvailableClasses([]);
             }
         }
     }, [data]);
 
     // Once availableClass is set, update options
     useEffect(() => {
-        setOptions(
-            availableClass.map((obj) => ({
-                label: objectClasses[obj],  // Ensure label is a string
-                value: obj.toString()
-            }))
-        );
-    }, [data, availableClass]);
-
-    // State for showing object labels
-    const [showObjectLabels, setShowObjectLabels] = useState(true);
+        const newOptions = availableClasses.map((obj) => ({
+            label: objectClasses[obj],  // Ensure label is a string
+            value: `${obj}`
+        }));
+        setOptions(newOptions);
+        console.log("Options", newOptions);
+    }, [availableClasses]);
 
     const applySettings = async () => {
-        if (selectedClass.length > 0) {
+        if (selectedClasses.length > 0) {
             const settingData = {
                 info: {
                     clusterId: data.cluster_id,
                     versionId: data.id,
                 },
                 settings: {
-                    classes: selectedClass.join(","),
+                    classes: selectedClasses.join(","),
                     showLabel: showObjectLabels
                 }
-            }
+            };
+            setVideoURL();
             try {
                 setLoadVideo(false);
                 setIsLoading(true);
-                
                 setRenderProgress(0);
                 setCurrentImage('');
-                console.log(`http://localhost:5000/api/segmentation/render?clusterId=${settingData.info.clusterId}&versionId=${settingData.info.versionId}&showLabel=${settingData.settings.showLabel}&classes=${settingData.settings.classes}`)
+
                 const eventSource = new EventSource(`http://localhost:5000/api/segmentation/render?clusterId=${settingData.info.clusterId}&versionId=${settingData.info.versionId}&showLabel=${settingData.settings.showLabel}&classes=${settingData.settings.classes}`);
 
                 eventSource.onmessage = (event) => {
@@ -85,7 +85,7 @@ export default function Settings() {
                         setIsLoading(false);
                         toast.current.show({ severity: 'success', summary: 'Success', detail: 'Video rendered successfully!', life: 3000 });
                         setLoadVideo(true);
-                        setClassList(selectedClass);
+                        setClassList(selectedClasses);
                         setShowLabel(showObjectLabels);
                     }
                 };
@@ -93,7 +93,6 @@ export default function Settings() {
                 eventSource.onerror = () => {
                     eventSource.close();
                     setIsLoading(false);
-                    // revalidate_path(`/version/${data.id}`)
                     toast.current.show({ severity: 'error', summary: 'Error', detail: 'Failed to render video', life: 3000 });
                 };
 
@@ -108,6 +107,16 @@ export default function Settings() {
         }
     };
 
+    const setVideoURL = ()=> {
+        const sortedClasses = [...selectedClasses].sort();
+        const classString = sortedClasses.length > 1 ? sortedClasses.join("_") : sortedClasses[0] || "";
+        if (classString !== "") {
+            const prefix = showLabel ? "l_" : "nl_";
+            const videoName = prefix + classString
+            setVideoSrc(`http://localhost:5000/video/${data.cluster_id}/${data.id}/${encodeURIComponent(videoName)}.mp4`)
+        }
+    }
+
     return (
         <>
             <Toast ref={toast} />
@@ -120,9 +129,9 @@ export default function Settings() {
                             <div>
                                 <label className="text-sm block mb-2">Display Classes:</label>
                                 <MultiSelect
-                                    value={selectedClass.map(index => options[index]?.value || "")} // Avoid undefined issues
+                                    value={selectedClasses.map(v => `${v}`)} // Avoid undefined issues
                                     options={options}
-                                    onChange={(e) => setSelectedClass(e.value)}
+                                    onChange={(e) => setSelectedClasses(e.value.map((v: string) => parseInt(v)))}
                                     display="chip"
                                     optionLabel="label"
                                     optionValue="value"

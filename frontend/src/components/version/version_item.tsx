@@ -8,15 +8,23 @@ import { Tag } from "primereact/tag"
 import { useState } from "react"
 
 export default function VersionItem({ item, href }: { item: ClusterVersions, href: string }) {
-  const [availableClass, setAvailableClass] = useState<number[]>(JSON.parse(item.classes?.toString() ?? ""))
+  const [availableClass, setAvailableClass] = useState<number[]>(() => {
+    try {
+      return item.classes ? JSON.parse(item.classes.toString()) : [];
+    } catch (error) {
+      console.error("Error parsing JSON:", error);
+      return [];
+    }
+  });
+
 
   const getStatusColor = (status: ClusterVersionStatus): "success" | "info" | "warning" | "danger" | "secondary" | "contrast" | null | undefined => {
     switch (status) {
-        case 'ACTIVE': return "success";
-        case 'DEACTIVE': return "danger";
-        case 'UNPROCESS': return "warning";
+      case 'ACTIVE': return "success";
+      case 'DEACTIVE': return "danger";
+      case 'UNPROCESS': return "warning";
     }
-};
+  };
 
   return (
     <Link href={href} className="block transform transition-all duration-200 hover:scale-[1.02] hover:shadow-lg">
@@ -40,7 +48,7 @@ export default function VersionItem({ item, href }: { item: ClusterVersions, hre
 
         <div className="p-4">
           <div className="flex flex-wrap gap-1 items-start mb-2">
-              {availableClass.map((c)=> (
+            {availableClass.map((c) => (
               <Tag key={c}>{objectClasses[c]}</Tag>))}
           </div>
 

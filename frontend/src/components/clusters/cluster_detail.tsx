@@ -1,10 +1,10 @@
 "use client"
 
 import { TabPanel, TabView } from "primereact/tabview";
-import { ClusterContext } from "@/contexts/clusters/clusterContext";
 import ClusterSettings from "./cluster_settings";
 import { ClusterWithVersion } from "@/types/clusters";
 import VersionList from "./version_list";
+import { ClusterContext } from "@/contexts/clusters/clusterContext";
 
 export default function ClusterDetail({ data }: { data: ClusterWithVersion }) {
 

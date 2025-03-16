@@ -38,10 +38,6 @@ interface ImageWithAddress {
     road: string;
 }
 
-type ProgressStore = {
-    [processId: string]: number;
-}
-
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export async function GET(req: NextRequest) {
@@ -51,11 +47,10 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ message: "No resource id provided", status: 400 });
     }
 
-    // 1. get resource with image
     const resource = await prisma.resources.findFirst({
         where: { id: resourceId },
         include: { Images: true }
-    })
+    });
 
     if (!resource) {
         return NextResponse.json({ message: "No resource available", status: 400 });
@@ -65,24 +60,33 @@ export async function GET(req: NextRequest) {
     const readableStream = new ReadableStream({
         async start(controller) {
             let progress = 0;
+            let lastAddressData: AddressData | null = null;
 
-            // 2. Prepare variable 
             const uniqueRoads = new Set<string>();
             const grouped: Record<string, ImageWithAddress[]> = {};
 
-            // 3. Convert lat & lon to address and grouping
-            for (const image of resource.Images) {
+            for (let i = 0; i < resource.Images.length; i++) {
+                const image = resource.Images[i];
                 console.log(image.file_name, "processing");
-                const result: AddressData = await reverse_geocode(image.latitude, image.longitude);
+
+                let result: AddressData | null = null;
+
+                // Fetch new geocode data every 100 images
+                if (i % 100 === 0 || !lastAddressData) {
+                    result = await reverse_geocode(image.latitude, image.longitude);
+                    lastAddressData = result;
+                    console.log("Fetching new reverse geocode data...");
+                    await delay(1000); // Reduce delay slightly for better performance
+                } else {
+                    result = lastAddressData;
+                    console.log("Using cached reverse geocode data...");
+                }
+
                 if (!result) continue;
 
                 progress += 1;
 
-                if (uniqueRoads.has(result.address.road)) {
-                    if (!grouped[result.address.road]) {
-                        grouped[result.address.road] = [];
-                    }
-                } else {
+                if (!uniqueRoads.has(result.address.road)) {
                     uniqueRoads.add(result.address.road);
                     grouped[result.address.road] = [];
                 }
@@ -92,23 +96,21 @@ export async function GET(req: NextRequest) {
                     address: result.display_name,
                     road: result.address.road
                 });
-                const data = `data: ${JSON.stringify({ progress })}\n\n`
+
+                const data = `data: ${JSON.stringify({ progress })}\n\n`;
                 controller.enqueue(encoder.encode(data));
-                await delay(1000); // Prevent API blocking
             }
 
             for (const road of uniqueRoads) {
                 const cluster = await getCluster(road, grouped[road][0].address);
                 const version = await getClusterVersion(cluster.id);
-        
-                // Update images to associate them with the correct cluster version
+
                 const clusterImages = grouped[road].map(images => ({
-                    version_id: version.id,  // Set the cluster version for the image
+                    version_id: version.id,
                     image_id: images.image.id
                 }));
-        
+
                 if (clusterImages.length > 0) {
-                    // Update images with the new cluster version ID
                     await prisma.images.updateMany({
                         where: {
                             id: {
@@ -116,16 +118,16 @@ export async function GET(req: NextRequest) {
                             },
                         },
                         data: {
-                            version_id: version.id,  // Update the version_id field in the Images table
+                            version_id: version.id,
                         },
                     });
                 }
             }
-            
+
             await prisma.resources.update({
                 where: { id: resourceId },
                 data: { status: "DONE" }
-            })
+            });
 
             controller.close();
         },
@@ -147,14 +149,14 @@ const reverse_geocode = async (lat: number, lon: number) => {
         return data;
     } catch (error) {
         console.log(error);
-        return null
+        return null;
     }
 }
 
 const getCluster = async (road: string, address: string): Promise<Clusters> => {
     let cluster = await prisma.clusters.findFirst({
         where: { road },
-    })
+    });
 
     if (!cluster) {
         cluster = await prisma.clusters.create({
@@ -163,15 +165,15 @@ const getCluster = async (road: string, address: string): Promise<Clusters> => {
                 road: road,
                 address: address
             },
-        })
+        });
     }
-    return cluster
+    return cluster;
 }
 
 const getClusterVersion = async (clusterId: string) => {
     const versions = await prisma.clusterVersions.findMany({
         where: { cluster_id: clusterId }
-    })
+    });
 
     let newVersion;
     if (versions.length === 0) {
@@ -182,7 +184,7 @@ const getClusterVersion = async (clusterId: string) => {
                 price_per_class: 0,
                 version: 1
             }
-        })
+        });
     } else {
         let newVersionNum = Math.max(...versions.map(v => v.version)) + 1;
         newVersion = await prisma.clusterVersions.create({
@@ -192,7 +194,7 @@ const getClusterVersion = async (clusterId: string) => {
                 price_per_class: 0,
                 version: newVersionNum
             }
-        })
+        });
     }
     return newVersion;
 }

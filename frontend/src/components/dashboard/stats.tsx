@@ -4,7 +4,7 @@
 export default function DashboardStats() {
     return (
         <div className="grid grid-cols-4">
-            <div className="shadow-md p-3 border-1 border-50 rounded-md">
+            {/* <div className="shadow-md p-3 border-1 border-50 rounded-md">
                 <div className="flex justify-between mb-3">
                     <div>
                         <span className="block text-500 font-medium mb-3">Orders</span>
@@ -16,7 +16,7 @@ export default function DashboardStats() {
                 </div>
                 <span className="text-green-500 font-medium">24 new </span>
                 <span className="text-500">since last visit</span>
-            </div>
+            </div> */}
         </div>
     )
 }
