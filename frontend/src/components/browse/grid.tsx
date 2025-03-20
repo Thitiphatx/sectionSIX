@@ -1,11 +1,9 @@
 "use client"
-import { Clusters } from "@prisma/client";
 import Image from "next/image";
 import { Tag } from "primereact/tag";
 import Link from "next/link";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { BrowseItem } from "@/types/browse";
-import { Tooltip } from "primereact/tooltip";
 
 export default function BrowseGrid({ clusters, isLoading }: { clusters: BrowseItem[], isLoading: boolean }) {
 
@@ -53,13 +51,6 @@ const ClusterGridItem = ({ item }: { item: BrowseItem }) => {
                         height={300} 
                         src={`http:localhost:5000/preview/${item.id}/${item.ClusterVersions[0].id}`}
                     />
-                    <div className="absolute top-0 right-0 m-2">
-                        <Tag 
-                            value="Segmented" 
-                            severity="success" 
-                            className="shadow-sm" 
-                        />
-                    </div>
                 </div>
                 
                 <div className="p-4">

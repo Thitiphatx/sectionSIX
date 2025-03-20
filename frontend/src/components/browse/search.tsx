@@ -12,7 +12,7 @@ export default function BrowseSearch({ onSearch, defaultQuery = "", }: { onSearc
     }
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="col-span-2">
             <label>
                 Search
             <div className="p-inputgroup flex-1">

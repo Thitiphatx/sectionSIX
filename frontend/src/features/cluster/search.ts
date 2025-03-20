@@ -9,11 +9,19 @@ export async function getClusters(query: string) {
                 contains: query,   // Partial match
                 mode: "insensitive", // Case insensitive
             },
+            ClusterVersions: {
+                every: {
+                    status: {
+                        not: "UNPROCESS"
+                    }
+                }
+            }
         },
         include: {
             ClusterVersions: {
                 select: {
-                    id: true
+                    id: true,
+                    classes: true
                 }
             }
         }
