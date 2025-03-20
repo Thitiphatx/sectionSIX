@@ -9,7 +9,11 @@ export default async function page({ params }: { params: Promise<{ clusterId: st
         include: {
             ClusterVersions: {
                 include: {
-                    Images: true
+                    Images: {
+                        select: {
+                            id: true
+                        }
+                    }
                 }
             }
         }

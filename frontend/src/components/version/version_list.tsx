@@ -1,7 +1,7 @@
 "use client"
 import { useClusterContext } from '@/contexts/clusters/clusterContext';
 import React from 'react';
-import VersionItem from '../version/version_item';
+import VersionItem from './version_item';
 
 export default function VersionList() {
     const context = useClusterContext();
@@ -18,7 +18,7 @@ export default function VersionList() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {context.ClusterVersions.length > 0 ? (
                     context.ClusterVersions.map((item, index) => (
-                        <VersionItem item={item} key={index} />
+                        <VersionItem item={item} key={index} href={`/dashboard/cluster/${item.cluster_id}/${item.id}`} />
                     ))
                 ) : (
                     <div className="col-span-full text-center py-10 bg-gray-50 rounded-lg border border-gray-200">

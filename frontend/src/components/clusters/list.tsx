@@ -1,8 +1,8 @@
 "use client"
 
 import { Clusters } from "@prisma/client"
-import ClusterGrid from "./cluster_grid";
-import ClusterSearch from "./cluster_search";
+import ClusterGrid from "./grid";
+import ClusterSearch from "./search";
 import { ClustersProvider } from "@/contexts/clusters/clustersContext";
 import { getClusters } from "@/features/cluster/search";
 import { useEffect, useState } from "react";

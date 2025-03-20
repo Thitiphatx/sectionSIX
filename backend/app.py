@@ -1,5 +1,5 @@
 import os
-from flask import Flask, Response, request
+from flask import Flask, Response, request, send_file
 from flask_cors import CORS
 from segmentation import segment_model_list
 from apis.startSegmentation import startSegmentation
@@ -32,7 +32,7 @@ def segmentation_render():
 @app.route('/video/<path:clusterId>/<path:versionId>/<path:video>')
 def stream_video(clusterId, versionId, video):
     video_path = os.path.join("..", "storage", "clusters", clusterId, "versions", versionId, "videos", video)
-    print(video_path)
+
     # Check if the video exists
     if not os.path.exists(video_path):
         return "Video not found", 404
@@ -44,6 +44,23 @@ def stream_video(clusterId, versionId, video):
                 yield chunk
 
     return Response(generate(), content_type="video/mp4")
+
+@app.route('/preview/<path:clusterId>/<path:versionId>')
+def stream_preview(clusterId, versionId):
+    image_dir = os.path.join("..", "storage", "clusters", clusterId, "versions", versionId, "images")
+    
+    if not os.path.exists(image_dir):
+        no_preview = os.path.join("assets", "no-preview.jpg")
+        return send_file(no_preview, mimetype='image/jpeg')
+    
+    first_image = os.listdir(image_dir)[0]
+
+    image_path = os.path.join(image_dir, first_image)
+
+    return send_file(image_path, mimetype='image/jpeg')
+    
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

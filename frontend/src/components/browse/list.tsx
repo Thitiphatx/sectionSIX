@@ -7,12 +7,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import BrowseSearch from "./search";
 import BrowseGrid from "./grid";
 import { Card } from "primereact/card";
+import { BrowseItem } from "@/types/browse";
 
 export default function BrowseList() {
     const searchParams = useSearchParams();
     const router = useRouter();
 
-    const [clusters, setClusters] = useState<Clusters[]>([]);
+    const [clusters, setClusters] = useState<BrowseItem[]>([]);
     const [loading, setLoading] = useState(false);
 
     // Get query from URL on load
@@ -35,7 +36,7 @@ export default function BrowseList() {
     }
 
     return (
-        <div className="p-4">
+        <div className="p-4 max-w-screen-xl mx-auto">
             <Card>
                 <BrowseSearch onSearch={handleSearch} defaultQuery={searchParams.get("s") || ""} />
                 <BrowseGrid isLoading={loading} clusters={clusters} />

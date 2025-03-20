@@ -1,10 +1,10 @@
 "use client"
-import ResourceInfoPanel from "./resource_info_panel"
 import { TabView, TabPanel } from "primereact/tabview"
-import ResourceDeletePanel from "./resource_delete_panel"
+import ResourceDeletePanel from "./delete"
 import { ResourceContext } from "@/contexts/resources/context"
 import { ResourceWithImage } from "@/types/resources"
-import ResourceCluster from "./resource_cluster"
+import ResourceCluster from "./extraction"
+import ResourceInfoPanel from "./settings"
 
 interface props {
     data: ResourceWithImage

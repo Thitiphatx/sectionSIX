@@ -1,13 +1,14 @@
 "use client"
 
-import { ClusterVersions, ClusterVersionStatus } from "@prisma/client"
+import { ClusterVersionStatus } from "@prisma/client"
 import { objectClasses } from "@/types/classes";
 import Image from "next/image"
 import Link from "next/link"
 import { Tag } from "primereact/tag"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { VersionWithAddress } from "@/types/version";
 
-export default function VersionItem({ item, href }: { item: ClusterVersions, href: string }) {
+export default function VersionItem({ item, href }: { item: VersionWithAddress, href: string }) {
   const [availableClass, setAvailableClass] = useState<number[]>(() => {
     try {
       return item.classes ? JSON.parse(item.classes.toString()) : [];
@@ -35,7 +36,7 @@ export default function VersionItem({ item, href }: { item: ClusterVersions, hre
             alt={"Cluster thumbnail"}
             width={400}
             height={300}
-            src="https://media.istockphoto.com/id/1147544807/vector/thumbnail-image-vector-graphic.jpg?s=612x612&w=0&k=20&c=rnCKVbdxqkjlcs3xH87-9gocETqpspHFXu5dIGB4wuM="
+            src={`http:localhost:5000/preview/${item.cluster_id}/${item.id}`}
           />
           <div className="absolute top-0 right-0 m-2">
             <Tag
@@ -47,15 +48,22 @@ export default function VersionItem({ item, href }: { item: ClusterVersions, hre
         </div>
 
         <div className="p-4">
+          {/* <h1 className="font-extrabold">{item.cluster.address}</h1> */}
           <div className="flex flex-wrap gap-1 items-start mb-2">
             {availableClass.map((c) => (
               <Tag key={c}>{objectClasses[c]}</Tag>))}
           </div>
-
           <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
-            <span className="text-xs text-gray-500 flex items-center">
-              <i className="pi pi-images mr-1"></i>
-              {item.created_at.toDateString()}
+            <span className="text-xs text-gray-500 flex flex-row items-center gap-2">
+              <div className="flex flex-row items-center gap-1">
+                <i className="pi pi-calendar text-sm"></i>
+                <p>{item.created_at.toLocaleDateString()}</p>
+              </div>
+              <div className="flex flex-row items-center gap-1">
+                <i className="pi pi-images text-sm"></i>
+                <p className="text-sm">{item.Images.length}</p>
+              </div>
+
             </span>
 
             <span className="text-xs text-blue-600 flex items-center hover:underline">

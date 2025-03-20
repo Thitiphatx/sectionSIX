@@ -10,5 +10,12 @@ export async function getClusters(query: string) {
                 mode: "insensitive", // Case insensitive
             },
         },
+        include: {
+            ClusterVersions: {
+                select: {
+                    id: true
+                }
+            }
+        }
     });
 }

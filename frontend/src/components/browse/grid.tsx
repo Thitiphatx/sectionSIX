@@ -4,8 +4,10 @@ import Image from "next/image";
 import { Tag } from "primereact/tag";
 import Link from "next/link";
 import { ProgressSpinner } from "primereact/progressspinner";
+import { BrowseItem } from "@/types/browse";
+import { Tooltip } from "primereact/tooltip";
 
-export default function BrowseGrid({ clusters, isLoading }: { clusters: Clusters[], isLoading: boolean }) {
+export default function BrowseGrid({ clusters, isLoading }: { clusters: BrowseItem[], isLoading: boolean }) {
 
     if (isLoading) {
         return (
@@ -19,7 +21,7 @@ export default function BrowseGrid({ clusters, isLoading }: { clusters: Clusters
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
                     <i className="pi pi-sitemap"></i>
-                    Clusters ({clusters.length})
+                    Available address ({clusters.length})
                 </h2>
             </div>
             
@@ -39,7 +41,7 @@ export default function BrowseGrid({ clusters, isLoading }: { clusters: Clusters
     );
 }
 
-const ClusterGridItem = ({ item }: { item: Clusters }) => {
+const ClusterGridItem = ({ item }: { item: BrowseItem }) => {
     return (
         <Link href={`/cluster/${item.id}`} className="block transform transition-all duration-200 hover:scale-[1.02] hover:shadow-lg">
             <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-100 h-full">
@@ -49,7 +51,7 @@ const ClusterGridItem = ({ item }: { item: Clusters }) => {
                         alt={item.address || "Cluster thumbnail"} 
                         width={400} 
                         height={300} 
-                        src="https://media.istockphoto.com/id/1147544807/vector/thumbnail-image-vector-graphic.jpg?s=612x612&w=0&k=20&c=rnCKVbdxqkjlcs3xH87-9gocETqpspHFXu5dIGB4wuM=" 
+                        src={`http:localhost:5000/preview/${item.id}/${item.ClusterVersions[0].id}`}
                     />
                     <div className="absolute top-0 right-0 m-2">
                         <Tag 
@@ -63,8 +65,8 @@ const ClusterGridItem = ({ item }: { item: Clusters }) => {
                 <div className="p-4">
                     <div className="flex justify-between items-start mb-2">
                         <h3 className="font-bold text-lg text-gray-800 line-clamp-1">{item.address}</h3>
-                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                            
+                        <span className=".version-length text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                            {item.ClusterVersions.length}
                         </span>
                     </div>
                     
@@ -75,8 +77,8 @@ const ClusterGridItem = ({ item }: { item: Clusters }) => {
                     
                     <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
                         <span className="text-xs text-gray-500 flex items-center">
-                            <i className="pi pi-images mr-1"></i>
-                            {/* {item.image_count || "0"} images */}
+                            <i className="pi pi-calendar mr-1"></i>
+                            {item.created_at.toLocaleDateString()}
                         </span>
                         
                         <span className="text-xs text-blue-600 flex items-center hover:underline">

@@ -49,7 +49,7 @@ const ClusterGridItem = ({ item }: { item: Clusters }) => {
                         alt={item.address || "Cluster thumbnail"} 
                         width={400} 
                         height={300} 
-                        src="https://media.istockphoto.com/id/1147544807/vector/thumbnail-image-vector-graphic.jpg?s=612x612&w=0&k=20&c=rnCKVbdxqkjlcs3xH87-9gocETqpspHFXu5dIGB4wuM=" 
+                        src={``}
                     />
                     <div className="absolute top-0 right-0 m-2">
                         <Tag 

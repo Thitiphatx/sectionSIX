@@ -4,7 +4,11 @@ export type ClusterWithVersion = Prisma.ClustersGetPayload<{
     include: {
         ClusterVersions: {
             include: {
-                Images: true
+                Images: {
+                    select: {
+                        id: true
+                    }
+                }
             }
         }
     };

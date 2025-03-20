@@ -1,25 +1,10 @@
-import { PanelMenu } from "primereact/panelmenu";
-
-const navItems = [
-    {
-        label: 'profile',
-        icon: 'pi pi-user',
-        url: '/account/profile'
-    },
-    {
-        label: 'purchases',
-        icon: 'pi pi-receipt',
-        url: '/account/purchases'
-    }
-]
+import AccountSidebar from "@/components/account/sidebar";
 
 export default function AccountLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     return (
-        <div className="flex flex-row">
-            <div className="w-1/6">
-            <PanelMenu model={navItems} />
-            </div>
-            <div className="w-5/6">
+        <div className="flex min-h-[calc(100vh-5rem)] p-5 gap-5">
+            <AccountSidebar />
+            <div className="flex-1">
                 {children}
             </div>
         </div>

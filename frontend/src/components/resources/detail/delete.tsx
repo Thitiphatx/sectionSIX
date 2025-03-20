@@ -14,8 +14,8 @@ export default function ResourceDeletePanel() {
     const data = useResourceContext();
     const toast = useRef<Toast>(null);
     const accept = async () => {
-
         try {
+            console.log(data)
             await DeleteResource(data.id);
             toast.current?.show({ severity: 'info', summary: 'Confirmed', detail: 'You have accepted', life: 3000 });
             router.push("/dashboard/resources")
@@ -26,7 +26,7 @@ export default function ResourceDeletePanel() {
 
     const confirm = () => {
         confirmDialog({
-            message: 'Do you want to delete this resource? Segmented image will still exist.',
+            message: 'Do you want to delete this resource? Image and cluster will still exist.',
             header: 'Delete Confirmation',
             icon: 'pi pi-info-circle',
             defaultFocus: 'reject',

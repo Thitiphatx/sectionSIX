@@ -3,7 +3,7 @@
 import { TabPanel, TabView } from "primereact/tabview";
 import ClusterSettings from "./cluster_settings";
 import { ClusterWithVersion } from "@/types/clusters";
-import VersionList from "./version_list";
+import VersionList from "../version/version_list";
 import { ClusterContext } from "@/contexts/clusters/clusterContext";
 
 export default function ClusterDetail({ data }: { data: ClusterWithVersion }) {
