@@ -1,10 +1,9 @@
 "use client"
 
-import { useClusterContext } from "@/contexts/clusters/clusterContext";
+import { ClusterWithVersionWithImage } from "@/app/dashboard/cluster/[clusterId]/page";
 import { Card } from "primereact/card";
 
-export default function ClusterSettings() {
-    const context = useClusterContext();
+export default function ClusterInfo({ data }: { data: ClusterWithVersionWithImage }) {
     return (
         <Card className="shadow-md border-0">
             <div className="space-y-4">
@@ -12,7 +11,7 @@ export default function ClusterSettings() {
                     <div>
                         <div className="flex items-center gap-2">
                             <i className="pi pi-map-marker text-blue-500"></i>
-                            <h2 className="text-xl font-bold text-gray-800">{context.road}</h2>
+                            <h2 className="text-xl font-bold text-gray-800">{data.road}</h2>
                         </div>
                         <div className="flex items-center text-sm text-gray-500 mt-2">
                             <span className="mr-3 flex items-center">
@@ -29,7 +28,7 @@ export default function ClusterSettings() {
 
                 <div className="border-t border-gray-200 pt-4">
                     <h3 className="text-md font-semibold mb-2">Location Details</h3>
-                    <p className="text-gray-700">{context.address}</p>
+                    <p className="text-gray-700">{data.address}</p>
                 </div>
             </div>
         </Card>

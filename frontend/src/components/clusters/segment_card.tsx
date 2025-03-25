@@ -24,7 +24,7 @@ export default function SegmentCard() {
     useEffect(() => {
         const fetchModels = async () => {
             try {
-                const response = await fetch("http://localhost:5000/api/segmentation/list");
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/segmentation/list`);
                 if (!response.ok) return null;
 
                 const result = await response.json();
@@ -56,7 +56,7 @@ export default function SegmentCard() {
 
     const performSegmentation = async () => {
         try {
-            const eventSource = new EventSource(`http://localhost:5000/api/segmentation/start?model=${selectedModel}&resourceId=${context.Images[0].resource_id}&clusterId=${context.cluster_id}&versionId=${context.id}`);
+            const eventSource = new EventSource(`${process.env.NEXT_PUBLIC_API_URL}/api/segmentation/start?model=${selectedModel}&resourceId=${context.Images[0].resource_id}&clusterId=${context.cluster_id}&versionId=${context.id}`);
 
             eventSource.onmessage = async (event) => {
                 const result = JSON.parse(event.data);

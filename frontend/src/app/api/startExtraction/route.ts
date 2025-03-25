@@ -181,7 +181,6 @@ const getClusterVersion = async (clusterId: string) => {
             data: {
                 cluster_id: clusterId,
                 price: 99999,
-                price_per_class: 0,
                 version: 1
             }
         });
@@ -191,7 +190,6 @@ const getClusterVersion = async (clusterId: string) => {
             data: {
                 cluster_id: clusterId,
                 price: 99999,
-                price_per_class: 0,
                 version: newVersionNum
             }
         });

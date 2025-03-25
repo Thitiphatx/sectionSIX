@@ -10,7 +10,6 @@ export default async function VersionPage({ params }: { params: Promise<{ versio
             Images: true
         }
     })
-    console.log(data);
 
     if (!data) {
         return (

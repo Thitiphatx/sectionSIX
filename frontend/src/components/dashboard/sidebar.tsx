@@ -17,15 +17,13 @@ export default function DashboardSidebar() {
 					icon: 'pi pi-objects-column',
 					url: '/dashboard/cluster'
 				},
-
+				{
+					label: 'transaction',
+					icon: 'pi pi-receipt',
+					url: '/dashboard/transaction'
+				},
 			]
 		},
-        {
-            label: "segmented",
-            items: [
-
-            ]
-        },
         {
             label: "user",
             items: [

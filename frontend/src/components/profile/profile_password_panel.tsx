@@ -50,19 +50,19 @@ export default function ProfilePasswordPanel() {
                 
                 <div className="flex flex-col gap-2">
                     <label htmlFor="currentPass">Current password</label>
-                    <input type="password" {...register("currentPassword")} />
+                    <input className="p-inputtext text-xs" type="password" {...register("currentPassword")} />
                     {errors.currentPassword && <small className="p-error text-sm">{errors.currentPassword.message}</small>}
                 </div>
 
                 <div className="flex flex-col gap-2">
                     <label htmlFor="newPass">New password</label>
-                    <input type="password" {...register("password")}  />
+                    <input className="p-inputtext text-xs" type="password" {...register("password")}  />
                     {errors.password && <small className="p-error text-sm">{errors.password.message}</small>}
                 </div>
 
                 <div className="flex flex-col gap-2">
                     <label htmlFor="confirmPass">Password confirmation</label>
-                    <input type="password" {...register("confirmPassword")}/>
+                    <input className="p-inputtext text-xs" type="password" {...register("confirmPassword")}/>
                     {errors.confirmPassword && <small className="p-error text-sm">{errors.confirmPassword.message}</small>}
                 </div>
 

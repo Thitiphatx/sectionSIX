@@ -13,7 +13,7 @@ export async function POST(req: Request) {
             automatic_payment_methods: { enabled: true },
             metadata: {
                 userId: userId,
-                versionId: versionId,
+                versionId: versionId
             }
         });
 

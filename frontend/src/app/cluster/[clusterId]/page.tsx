@@ -1,5 +1,5 @@
 // app/clusters/[clusterId]/versions/page.tsx
-import VersionItem from '@/components/version/version_item'
+import VersionList from '@/components/dashboard/cluster/versionList'
 import prisma from '@/libs/prisma'
 import { notFound } from 'next/navigation'
 import { Card } from 'primereact/card'
@@ -40,15 +40,9 @@ export default async function ClusterVersionsPage({ params }: PageProps) {
                     Versions for {clusterVersions.address}
                 </h1>
 
-                <div className="grid grid-cols-3 gap-4">
-                    {clusterVersions.ClusterVersions.map((version) => (
-                        <VersionItem item={version} key={version.id} href={`/viewer/${version.id}`} />
-                    ))}
-
-                    {clusterVersions.ClusterVersions.length === 0 && (
-                        <p className="text-gray-500">No versions found matching your search</p>
-                    )}
-                </div>
+                {clusterVersions.ClusterVersions.length === 0 ? (
+                    <p className="text-gray-500">No versions found matching your search</p>
+                ) : <VersionList data={clusterVersions} isDashboard={false}/>}
             </Card>
         </div>
     )

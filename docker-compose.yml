@@ -1,44 +1,42 @@
 version: '3.8'
 
 services:
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #   environment:
-  #     - CHOKIDAR_USEPOLLING=true
-  #     - WATCHPACK_POLLING=true
-  #   ports:
-  #     - "3000:3000"
-  #   volumes:
-  #     - ./frontend:/app/frontend
-  #     - /app/node_modules
-  #   depends_on:
-  #     - backend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app/frontend
+      - /app/node_modules
+    depends_on:
+      - backend
 
-  # backend:
-  #   build:
-  #     context: ./backend
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "5000:5000"
-  #   environment:
-  #     - FLASK_APP=app2.py
-  #     - FLASK_ENV=development  # This is critical for debug mode
-  #     - FLASK_DEBUG=1  # Ensures that debug mode is activated
-  #     - CHOKIDAR_USEPOLLING=true
-  #   volumes:
-  #     - ./backend:/app  # Mount the local code into the container
-  #   depends_on:
-  #     - postgres
-  # stripe-cli:
-  #   image: stripe/stripe-cli
-  #   container_name: stripe-cli
-  #   command: "listen --forward-to frontend:3000/api/webhook/"
-  #   env_file:
-  #     - stripe_cli.env
-  #   depends_on:
-  #     - frontend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+    volumes:
+      - ./backend:/app/backend  # Mount the local code into the container
+    depends_on:
+      - postgres
+  stripe-cli:
+    image: stripe/stripe-cli
+    container_name: stripe-cli
+    command: "listen --forward-to frontend:3000/api/webhook/"
+    # env_file:
+    #   - stripe_cli.env
+    depends_on:
+      - frontend
   postgres:
     image: postgres:latest
     container_name: postgres

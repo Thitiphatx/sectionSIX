@@ -7,6 +7,7 @@ import 'primereact/resources/themes/lara-light-green/theme.css';
 
 import { SessionProvider } from "next-auth/react";
 import Navbar from "@/components/navbar";
+import Footer from "@/components/footer";
 
 const comfortaa = Comfortaa({
 	subsets: ["latin"],
@@ -28,7 +29,7 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en" data-theme="dark" suppressHydrationWarning>
-			<body className={`${comfortaa.className}  antialiased min-h-screen flex flex-col bg-zinc-100`}>
+			<body className={`${comfortaa.className}  antialiased min-h-screen flex flex-col bg-zinc-200`}>
 				<SessionProvider>
 					<PrimeReactProvider value={value}>
 						<header className="w-full">
@@ -37,6 +38,9 @@ export default function RootLayout({
 						<main className="flex-1">
 							{children}
 						</main>
+						<footer>
+							<Footer />
+						</footer>
 					</PrimeReactProvider>
 				</SessionProvider>
 			</body>

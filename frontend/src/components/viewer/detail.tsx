@@ -9,6 +9,8 @@ import { objectClasses } from "@/types/classes";
 import { Button } from "primereact/button";
 import { ProgressBar } from "primereact/progressbar";
 import { Card } from "primereact/card";
+import { SplitButton } from "primereact/splitbutton";
+import { Tag } from "primereact/tag";
 
 type ClassesOptions = {
 	label: string;
@@ -16,12 +18,12 @@ type ClassesOptions = {
 }
 
 export default function ViewerDetail({ data }: { data: ClusterVersions }) {
-	const [baseSrc] = useState(`http://localhost:5000/video/${data.cluster_id}/${data.id}`);
+	const [baseSrc] = useState(`${process.env.NEXT_PUBLIC_API_URL}/video/${data.cluster_id}/${data.id}`);
 	const [showVideo, setShowVideo] = useState(true);
 	const [options, setOptions] = useState<ClassesOptions[]>([]);
 
 
-	const [videoSrc, setVideoSrc] = useState<string>("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4");
+	const [videoSrc, setVideoSrc] = useState<string>(`${process.env.NEXT_PUBLIC_API_URL}/video/${data.cluster_id}/${data.id}/l_0.mp4`);
 	const [showLabel, setShowlabel] = useState<boolean>(true);
 	const [selectedClasses, setSelectedClasses] = useState<ClassesOptions[]>([]);
 
@@ -34,7 +36,6 @@ export default function ViewerDetail({ data }: { data: ClusterVersions }) {
 		if (data?.classes) {
 			try {
 				const classes: number[] = JSON.parse(data.classes.toString());
-				console.log("Found in video", classes);
 				const newOptions = classes.map((value) => ({
 					label: objectClasses[value],
 					value: value
@@ -48,7 +49,6 @@ export default function ViewerDetail({ data }: { data: ClusterVersions }) {
 	}, [data]);
 
 	const handleApply = () => {
-		// setShowVideo(false);
 		const prefix = showLabel ? "l_" : "nl_";
 		const sortedClasses = [...selectedClasses].sort();
 		const classString = sortedClasses.length > 1 ? sortedClasses.join("_") : sortedClasses[0];
@@ -61,7 +61,7 @@ export default function ViewerDetail({ data }: { data: ClusterVersions }) {
 			setCurrentImage('');
 			setIsLoading(true);
 
-			const eventSource = new EventSource(`http://localhost:5000/api/segmentation/render?clusterId=${data.cluster_id}&versionId=${data.id}&showLabel=${showLabel}&classes=${selectedClasses.join(",")}`);
+			const eventSource = new EventSource(`${process.env.NEXT_PUBLIC_API_URL}/api/segmentation/render?clusterId=${data.cluster_id}&versionId=${data.id}&showLabel=${showLabel}&classes=${selectedClasses.join(",")}`);
 			eventSource.onmessage = (event) => {
 				const res = JSON.parse(event.data);
 				setRenderProgress(res.progress);
@@ -139,17 +139,17 @@ export default function ViewerDetail({ data }: { data: ClusterVersions }) {
 					</Card>
 				</div>
 				<div className="lg:col-span-2 space-y-4">
-					{/* <Card className="shadow-md">
+					<Card className="shadow-md">
 						<div className="space-y-3">
 							<div>
 								<div className="flex flex-row gap-2 items-center">
 									<i className="pi pi-map-marker"></i>
-									<h2 className="text-xl font-bold line-clamp-1">{}</h2>
+									<h2 className="text-xl font-bold line-clamp-1"></h2>
 								</div>
 								<div className="flex items-center text-sm text-gray-500 mt-1">
 									<span className="mr-2">
 										<i className="pi pi-calendar mr-1"></i>
-										{formattedDate}
+										{data.created_at.toLocaleDateString()}
 									</span>
 									<span className="mr-2">
 										<i className="pi pi-tag mr-1"></i>
@@ -161,9 +161,9 @@ export default function ViewerDetail({ data }: { data: ClusterVersions }) {
 							<div className="border-t pt-3">
 								<div className="mb-2 text-sm text-gray-600">Classes:</div>
 								<div className="flex flex-wrap gap-2">
-									{foundObject.length > 0 ? (
-										foundObject.map((c, index) => (
-											<Tag key={index} value={objectClasses[c] || c} />
+									{options.length > 0 ? (
+										options.map((c, index) => (
+											<Tag key={index} value={c.label} />
 										))
 									) : (
 										<span className="text-gray-500 text-sm">No classes defined</span>
@@ -175,15 +175,15 @@ export default function ViewerDetail({ data }: { data: ClusterVersions }) {
 								<div className="flex items-center">
 
 								</div>
-								<SplitButton
+								{/* <SplitButton
 									label="Export"
 									icon="pi pi-download"
 									className="p-button-outlined"
 									model={items}
-								/>
+								/> */}
 							</div>
 						</div>
-					</Card> */}
+					</Card>
 				</div>
 			</div>
 		</div>

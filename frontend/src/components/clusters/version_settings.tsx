@@ -15,7 +15,6 @@ export default function VersionSettings() {
     const toast = useRef<Toast>(null);
     const [price, setPrice] = useState({
         basePrice: context.price,
-        classPrice: context.price_per_class
     });
     const [onSell, setOnSell] = useState(context.status === "ACTIVE");
     const [loading, setLoading] = useState<boolean>(false);
@@ -28,7 +27,7 @@ export default function VersionSettings() {
     const applySettings = async () => {
         setLoading(true);
         try {
-            await update_cluster_version(context.id, price.basePrice, price.classPrice, getStatus(onSell));
+            await update_cluster_version(context.id, price.basePrice, getStatus(onSell));
             toast.current?.show({
                 severity: 'success',
                 summary: 'Settings Applied',
@@ -69,19 +68,6 @@ export default function VersionSettings() {
                             <InputNumber
                                 value={price.basePrice}
                                 onValueChange={(e) => setPrice((prev) => ({ ...prev, basePrice: e.value || 0 }))}
-                                mode="currency"
-                                currency="THB"
-                                locale="th-TH"
-                                className="w-full"
-                                showButtons
-                                min={0}
-                            />
-                        </div>
-                        <div>
-                            <label className="text-sm font-medium text-gray-700 block mb-1">Price per class:</label>
-                            <InputNumber
-                                value={price.classPrice}
-                                onValueChange={(e) => setPrice((prev) => ({ ...prev, classPrice: e.value || 0 }))}
                                 mode="currency"
                                 currency="THB"
                                 locale="th-TH"

@@ -32,7 +32,7 @@ export default function BrowseFilter({ setSelectedFilters, selectedFilters }: { 
                         optionValue="value"
                         loading={loading}
                         filter
-                        placeholder="Select Cities"
+                        placeholder="Select Classes"
                         className="max-w-md w-full" />
                 </div>
             </label>

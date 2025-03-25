@@ -10,9 +10,14 @@ export default function AccountSidebar() {
             url: '/account/profile'
         },
         {
-            label: 'purchases',
-            icon: 'pi pi-receipt',
+            label: 'my purchases',
+            icon: 'pi pi-map',
             url: '/account/purchases'
+        },
+        {
+            label: 'transactions',
+            icon: 'pi pi-receipt',
+            url: '/account/transactions'
         }
     ]
     // const navItems = [

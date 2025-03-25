@@ -72,7 +72,7 @@ export default function Settings() {
                 setRenderProgress(0);
                 setCurrentImage('');
 
-                const eventSource = new EventSource(`http://localhost:5000/api/segmentation/render?clusterId=${settingData.info.clusterId}&versionId=${settingData.info.versionId}&showLabel=${settingData.settings.showLabel}&classes=${settingData.settings.classes}`);
+                const eventSource = new EventSource(`${process.env.NEXT_PUBLIC_API_URL}/api/segmentation/render?clusterId=${settingData.info.clusterId}&versionId=${settingData.info.versionId}&showLabel=${settingData.settings.showLabel}&classes=${settingData.settings.classes}`);
 
                 eventSource.onmessage = (event) => {
                     const res = JSON.parse(event.data);
@@ -113,7 +113,7 @@ export default function Settings() {
         if (classString !== "") {
             const prefix = showLabel ? "l_" : "nl_";
             const videoName = prefix + classString
-            setVideoSrc(`http://localhost:5000/video/${data.cluster_id}/${data.id}/${encodeURIComponent(videoName)}.mp4`)
+            setVideoSrc(`${process.env.NEXT_PUBLIC_API_URL}/video/${data.cluster_id}/${data.id}/${encodeURIComponent(videoName)}.mp4`)
         }
     }
 

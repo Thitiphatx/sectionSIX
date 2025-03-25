@@ -21,11 +21,12 @@ export async function POST(req: Request) {
 
     const paymentIntent = event.data.object as Stripe.PaymentIntent;
     if (event.type === 'payment_intent.succeeded') {
-        
         await prisma.transaction.create({
             data: {
                 user_id: paymentIntent.metadata.userId,
                 version_id: paymentIntent.metadata.versionId,
+                price: paymentIntent.amount,
+                status: "SUCCESS"
             }
         })
     }

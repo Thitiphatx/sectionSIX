@@ -31,7 +31,7 @@ model Resources {
 model Images {
   id          String           @id @default(uuid())
   resource_id String?
-  resource    Resources?        @relation(fields: [resource_id], references: [id])
+  resource    Resources?       @relation(fields: [resource_id], references: [id])
   version_id  String?
   version     ClusterVersions? @relation(fields: [version_id], references: [id])
   latitude    Float
@@ -56,7 +56,6 @@ model Clusters {
 model ClusterVersions {
   id              String               @id @default(uuid())
   price           Float
-  price_per_class Float
   version         Int
   created_at      DateTime             @default(now()) @db.Date
   status          ClusterVersionStatus @default(UNPROCESS)
@@ -68,12 +67,14 @@ model ClusterVersions {
 }
 
 model Transaction {
-  id             String            @id @default(uuid())
-  user_id        String
-  user           Users             @relation(fields: [user_id], references: [id])
-  version_id     String
-  version        ClusterVersions   @relation(fields: [version_id], references: [id])
-  purchase_date  DateTime          @default(now())
+  id            String            @id @default(uuid())
+  user_id       String
+  user          Users             @relation(fields: [user_id], references: [id])
+  version_id    String
+  version       ClusterVersions   @relation(fields: [version_id], references: [id])
+  purchase_date DateTime          @default(now())
+  price         Float
+  status        TransactionStatus
 }
 
 enum UserStatus {
@@ -100,4 +101,9 @@ enum ClusterVersionStatus {
   ACTIVE // listed on selling
   DEACTIVE // unlisted
   UNPROCESS // image not process segmentation yet
+}
+
+enum TransactionStatus {
+  SUCCESS
+  CANCELED
 }

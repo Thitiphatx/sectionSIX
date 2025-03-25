@@ -49,7 +49,7 @@ const ClusterGridItem = ({ item }: { item: BrowseItem }) => {
                         alt={item.address || "Cluster thumbnail"} 
                         width={400} 
                         height={300} 
-                        src={`http:localhost:5000/preview/${item.id}/${item.ClusterVersions[0].id}`}
+                        src={`${process.env.NEXT_PUBLIC_API_URL}/preview/${item.id}/${item.ClusterVersions[0].id}`}
                     />
                 </div>
                 

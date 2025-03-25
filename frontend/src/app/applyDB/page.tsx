@@ -3,14 +3,22 @@
 import prisma from "@/libs/prisma"
 
 export default async function Test() {
-    await prisma.images.updateMany({
-        where: {
-            version_id: "857223dc-56e4-4723-a1d0-b6136b2c52d8"
-        },
-        data: {
-            status: "AVAILABLE"
-        }
-    })
+  // await prisma.images.updateMany({
+  //     where: {
+  //         version_id: "2365324a-9d62-463a-be6d-3420996993ef"
+  //     },
+  //     data: {
+  //         status: "AVAILABLE"
+  //     }
+  // })
+  await prisma.clusterVersions.update({
+    where: {
+      id: "2365324a-9d62-463a-be6d-3420996993ef"
+    },
+    data: {
+      status: "ACTIVE"
+    }
+  })
   return (
     <div>page</div>
   )
