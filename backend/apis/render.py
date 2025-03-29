@@ -10,14 +10,19 @@ import os.path as osp
 import torch
 from utils.numpy_zip import npztoseg
 
+
 def renderVideo(clusterId, versionId, showLabel, classes):
     showLabelBool = showLabel.lower() == "true"
 
-    # Model initialization
+    # Model initialization with mixed precision enabled
     model = init_model(
         "./mmsegmentation/configs/segformer/segformer_mit-b5_8xb2-160k_ade20k-512x512.py", 
-        "./mmsegmentation/checkpoints/segformer/segformer_mit-b5_512x512_160k_ade20k_20210726_145235-94cedf59.pth", device='cuda:0')
+        "./mmsegmentation/checkpoints/segformer/segformer_mit-b5_512x512_160k_ade20k_20210726_145235-94cedf59.pth", 
+        device='cuda:0'
+    )
     model.half()
+    model.eval()
+
     dataset_meta = model.dataset_meta
     seg_local_visualizer = SegLocalVisualizer(
         vis_backends=[dict(type='LocalVisBackend')],
@@ -28,7 +33,7 @@ def renderVideo(clusterId, versionId, showLabel, classes):
     segments_dir = os.path.join("..", "storage", "clusters", clusterId, "versions", versionId, "segments")
     npz_files = sorted([f for f in os.listdir(segments_dir) if f.endswith('.npz')])
     if not npz_files:
-        raise ValueError("No .pt files found in the output directory")
+        raise ValueError("No .npz files found in the output directory")
 
     prefix = "l_" if showLabelBool else "nl_"
     video_name = prefix + classes.replace(",", "_") + ".mp4"
@@ -59,7 +64,7 @@ def renderVideo(clusterId, versionId, showLabel, classes):
 
     Thread(target=writer_thread, daemon=True).start()
 
-    # Processing loop
+    # Processing loop with optimizations
     total_frames = len(npz_files)
     selected_classes = [int(class_id) for class_id in classes.split(',')]
 
@@ -67,12 +72,12 @@ def renderVideo(clusterId, versionId, showLabel, classes):
         for idx, npz_file in enumerate(npz_files):
             npz_path = os.path.join(segments_dir, npz_file)
             ds = npztoseg(npz_path)
-            
-            with torch.cuda.amp.autocast():
-                pred_mask = ds.gt_sem_seg.data
-            
-            class_mask = torch.isin(pred_mask, torch.tensor(selected_classes, device=pred_mask.device))
-            modified_mask = torch.where(class_mask, pred_mask, 255)
+
+            with torch.no_grad(), torch.cuda.amp.autocast():  # Mixed precision and no gradients
+                pred_mask = ds.gt_sem_seg.data.to('cuda')  # Ensure tensor is on the GPU
+
+            class_mask = torch.isin(pred_mask, torch.tensor(selected_classes, device='cuda'))
+            modified_mask = torch.where(class_mask, pred_mask, 255).to('cuda')
             ds.gt_sem_seg.data = modified_mask
 
             image_path = os.path.join("../..", "storage", "clusters", clusterId, "versions", versionId, "images", npz_file.replace('.npz', '.jpg'))
@@ -95,6 +100,8 @@ def renderVideo(clusterId, versionId, showLabel, classes):
         # Final cleanup
         stop_event.set()
         frame_queue.join()
+        torch.cuda.empty_cache()  # Clear GPU cache
+
     finally:
         stop_event.set()
 

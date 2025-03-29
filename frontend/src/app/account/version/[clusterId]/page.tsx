@@ -50,7 +50,7 @@ export default async function VersionsPage({ params }: { params: { clusterId: st
 
     return (
         <div>
-            <Card className="p-4 w-full">
+            <div className="p-4 w-full bg-zinc-100 min-h-screen">
                 <div>
                     <h1 className="text-2xl font-bold mb-4">
                         Versions for {clusterVersions.address}
@@ -59,7 +59,7 @@ export default async function VersionsPage({ params }: { params: { clusterId: st
                 {clusterVersions.ClusterVersions.length === 0 ? (
                     <p className="text-gray-500">No versions found matching your search</p>
                 ) : <VersionList data={clusterVersions} isDashboard={false} />}
-            </Card>
+            </div>
         </div>
     )
 }

@@ -34,7 +34,7 @@ export async function handleSaveInfo({ id, name, email }: saveInfoProp) {
                 name: name
             }
         })
-
+        
     } catch (error) {
         return {
             message: "error"

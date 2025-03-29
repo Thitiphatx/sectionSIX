@@ -5,6 +5,8 @@ import { SigninFormSchema, SignupFormSchema } from "./schema"
 import { hashSync } from "bcryptjs"
 import { signIn, signOut } from "@/libs/auth"
 import { AuthError } from "next-auth"
+import { redirect, RedirectType } from "next/navigation"
+
 
 interface credentialsProp {
     email: string,
@@ -17,7 +19,8 @@ interface signUpCredentialsProp extends credentialsProp {
 
 export async function handleCredentialsSignin({ email, password }: credentialsProp) {
     try {
-        await signIn("credentials", { email, password, redirectTo: "/" },);
+        await signIn("credentials", { email, password, redirect: false },);
+        redirect("/", RedirectType.push);
     } catch (error) {
         if (error instanceof AuthError) {
             switch (error.type) {

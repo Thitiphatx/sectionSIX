@@ -1,9 +1,24 @@
 
-import { Card } from 'primereact/card';
 import TransactionList from '@/components/account/transactions/TransactionList';
 import prisma from '@/libs/prisma';
 import ErrorPage from '@/components/error';
 import { auth } from '@/libs/auth';
+import { Prisma } from '@prisma/client';
+
+export type FullTransaction = Prisma.TransactionGetPayload<{
+    include: { 
+        version: {
+            include: {
+                cluster: {
+                    select: {
+                        address: true,
+                        road: true
+                    }
+                }
+            }
+        }
+    }
+}>
 
 export default async function Transaction() {
     const session = await auth();
@@ -14,7 +29,18 @@ export default async function Transaction() {
 
     const data = await prisma.transaction.findMany({
         where: { user_id: session.user.id }, // Now it's guaranteed to be valid
-        include: { version: true },
+        include: { 
+            version: {
+                include: {
+                    cluster: {
+                        select: {
+                            address: true,
+                            road: true
+                        }
+                    }
+                }
+            }
+        },
     });
 
     if (!data.length) {

@@ -9,7 +9,7 @@ import { useRef } from "react";
 
 export default function Navbar() {
     const { data: session } = useSession();
-    const menuRight = useRef(null);
+    const menuRight = useRef<Menu>(null);
     const router = useRouter();
 
     const items = [

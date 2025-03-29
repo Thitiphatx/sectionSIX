@@ -81,7 +81,7 @@ export default function VersionList({ data, isDashboard }: { data: ClusterWithVe
                     {list.length > 0 ? (
                         list.map((item) => (
                             <Link key={item.id} href={isDashboard ? `/dashboard/cluster/${item.cluster_id}/${item.id}` : `/viewer/${item.id}`} className="block">
-                                <div className="bg-white rounded-lg overflow-hidden h-full ring-1 ring-zinc-300">
+                                <div className="bg-white rounded-lg overflow-hidden h-fit ring-1 ring-zinc-300">
                                     <div className="relative h-40 overflow-hidden">
                                         <Image
                                             className="w-full h-full object-cover"
@@ -99,23 +99,28 @@ export default function VersionList({ data, isDashboard }: { data: ClusterWithVe
                                         </div>
                                     </div>
 
-                                    <div className="p-4">
+                                    <div className="p-4 h-full">
                                         <h1 className="font-extrabold">{data.road}</h1>
                                         <div className="flex flex-wrap gap-1 items-start mb-2">
                                             {getAvailableClass(item.classes?.toString()).map((c) => (
                                                 <Tag key={c}>{objectClasses[c]}</Tag>))}
                                         </div>
                                         <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
-                                            <span className="text-xs text-gray-500 flex flex-row items-center gap-2">
-                                                <div className="flex flex-row items-center gap-1">
-                                                    <i className="pi pi-calendar text-sm"></i>
-                                                    <p>{item.created_at.toLocaleDateString()}</p>
+                                            <div className="text-gray-500 flex flex-row justify-between gap-2 w-full">
+                                                <div className="flex flex-row items-center gap-2 text-xs">
+                                                    <div className="flex flex-row items-center gap-1">
+                                                        <i className="pi pi-calendar text-sm"></i>
+                                                        <p>{item.created_at.toLocaleDateString()}</p>
+                                                    </div>
+                                                    <div className="flex flex-row items-center gap-1">
+                                                        <i className="pi pi-images text-sm"></i>
+                                                        <p className="text-sm">{item.Images.length}</p>
+                                                    </div>
                                                 </div>
-                                                <div className="flex flex-row items-center gap-1">
-                                                    <i className="pi pi-images text-sm"></i>
-                                                    <p className="text-sm">{item.Images.length}</p>
+                                                <div>
+                                                    ฿{item.price.toLocaleString()}
                                                 </div>
-                                            </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

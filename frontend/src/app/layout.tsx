@@ -30,7 +30,7 @@ export default function RootLayout({
 	return (
 		<html lang="en" data-theme="dark" suppressHydrationWarning>
 			<body className={`${comfortaa.className}  antialiased min-h-screen flex flex-col bg-zinc-200`}>
-				<SessionProvider>
+				<SessionProvider refetchInterval={0}>
 					<PrimeReactProvider value={value}>
 						<header className="w-full">
 							<Navbar />

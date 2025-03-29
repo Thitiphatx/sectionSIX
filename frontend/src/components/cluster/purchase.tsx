@@ -3,12 +3,12 @@ import { Button } from 'primereact/button'
 import { Card } from 'primereact/card'
 import { Divider } from 'primereact/divider'
 import { Badge } from 'primereact/badge'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ClusterVersions } from '@prisma/client'
 import Player2 from '../version/player'
+import { versionWithCluster } from '@/app/viewer/[versionId]/page'
 
-export default function Purchase({ versionData }: { versionData: ClusterVersions }) {
+export default function Purchase({ versionData }: { versionData: versionWithCluster }) {
     const router = useRouter();
 
     const submitPurchase = () => {

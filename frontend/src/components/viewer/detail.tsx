@@ -1,23 +1,26 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Player2 from "../version/player"
-import { ClusterVersions } from "@prisma/client";
 import { MultiSelect } from "primereact/multiselect";
 import { ToggleButton } from "primereact/togglebutton";
 import { objectClasses } from "@/types/classes";
 import { Button } from "primereact/button";
 import { ProgressBar } from "primereact/progressbar";
 import { Card } from "primereact/card";
-import { SplitButton } from "primereact/splitbutton";
 import { Tag } from "primereact/tag";
+import { Toast } from "primereact/toast";
+import { ImagesExport, versionWithCluster } from "@/app/viewer/[versionId]/page";
+import ExportButton from "./exportButton";
+import { Images } from "@prisma/client";
 
 type ClassesOptions = {
 	label: string;
 	value: number
 }
 
-export default function ViewerDetail({ data }: { data: ClusterVersions }) {
+export default function ViewerDetail({ data, images }: { data: versionWithCluster, images: ImagesExport[] }) {
+	const toast = useRef<Toast>(null);
 	const [baseSrc] = useState(`${process.env.NEXT_PUBLIC_API_URL}/video/${data.cluster_id}/${data.id}`);
 	const [showVideo, setShowVideo] = useState(true);
 	const [options, setOptions] = useState<ClassesOptions[]>([]);
@@ -49,10 +52,13 @@ export default function ViewerDetail({ data }: { data: ClusterVersions }) {
 	}, [data]);
 
 	const handleApply = () => {
+		if (selectedClasses.length < 1) {
+			toast.current?.show({severity:'error', summary: 'Error', detail:'Please select atleast 1 class', life: 3000});
+			return
+		}
 		const prefix = showLabel ? "l_" : "nl_";
 		const sortedClasses = [...selectedClasses].sort();
 		const classString = sortedClasses.length > 1 ? sortedClasses.join("_") : sortedClasses[0];
-
 
 		const videoName = prefix + classString
 		const src = `${baseSrc}/${encodeURIComponent(videoName)}.mp4`
@@ -61,7 +67,7 @@ export default function ViewerDetail({ data }: { data: ClusterVersions }) {
 			setCurrentImage('');
 			setIsLoading(true);
 
-			const eventSource = new EventSource(`${process.env.NEXT_PUBLIC_API_URL}/api/segmentation/render?clusterId=${data.cluster_id}&versionId=${data.id}&showLabel=${showLabel}&classes=${selectedClasses.join(",")}`);
+			const eventSource = new EventSource(`${process.env.NEXT_PUBLIC_API_URL}/api/segmentation/render?clusterId=${data.cluster_id}&versionId=${data.id}&showLabel=${showLabel}&classes=${classString}`);
 			eventSource.onmessage = (event) => {
 				const res = JSON.parse(event.data);
 				setRenderProgress(res.progress);
@@ -87,6 +93,7 @@ export default function ViewerDetail({ data }: { data: ClusterVersions }) {
 
 	return (
 		<div className="max-w-screen-xl mx-auto p-4">
+			<Toast ref={toast} />
 			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 				<div className="lg:col-span-2 space-y-4">
 					{showVideo && (
@@ -144,7 +151,7 @@ export default function ViewerDetail({ data }: { data: ClusterVersions }) {
 							<div>
 								<div className="flex flex-row gap-2 items-center">
 									<i className="pi pi-map-marker"></i>
-									<h2 className="text-xl font-bold line-clamp-1"></h2>
+									<h2 className="text-xl font-bold line-clamp-1">{data.cluster.address}</h2>
 								</div>
 								<div className="flex items-center text-sm text-gray-500 mt-1">
 									<span className="mr-2">
@@ -175,12 +182,7 @@ export default function ViewerDetail({ data }: { data: ClusterVersions }) {
 								<div className="flex items-center">
 
 								</div>
-								{/* <SplitButton
-									label="Export"
-									icon="pi pi-download"
-									className="p-button-outlined"
-									model={items}
-								/> */}
+								<ExportButton images={images}/>
 							</div>
 						</div>
 					</Card>
