@@ -105,5 +105,5 @@ enum ClusterVersionStatus {
 
 enum TransactionStatus {
   SUCCESS
-  CANCELED
+  FAILED
 }

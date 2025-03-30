@@ -59,7 +59,7 @@ export default function ImageUploadForm() {
         formData.append("index", index.toString());
         formData.append("totalChunks", totalChunks.toString());
         formData.append("fileName", file.name);
-        formData.append("resourceId", data.Images[0].resource_id);
+        formData.append("resourceId", data.Images[0].resource_id as string);
         formData.append("clusterId", data.cluster_id);
         formData.append("versionId", data.id);
 
@@ -79,7 +79,7 @@ export default function ImageUploadForm() {
                 life: 5000
             });
         } finally {
-            await resource_status_validation(data.Images[0].resource_id);
+            await resource_status_validation(data.Images[0].resource_id as string);
         }
 
         // Calculate overall progress

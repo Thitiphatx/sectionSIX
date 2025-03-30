@@ -51,7 +51,8 @@ export default async function ViewerLanding({ params }: { params: { versionId: s
     const isOwned = await prisma.transaction.findFirst({
         where: {
             user_id: session?.user.id,
-            version_id: versionId
+            version_id: versionId,
+            status: "SUCCESS"
         }
     })
 

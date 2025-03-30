@@ -25,8 +25,17 @@ export async function POST(req: Request) {
             data: {
                 user_id: paymentIntent.metadata.userId,
                 version_id: paymentIntent.metadata.versionId,
-                price: paymentIntent.amount,
+                price: paymentIntent.amount / 100,
                 status: "SUCCESS"
+            }
+        })
+    } else {
+        await prisma.transaction.create({
+            data: {
+                user_id: paymentIntent.metadata.userId,
+                version_id: paymentIntent.metadata.versionId,
+                price: paymentIntent.amount / 100,
+                status: "FAILED"
             }
         })
     }

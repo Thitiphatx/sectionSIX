@@ -69,7 +69,7 @@ export default function TransactionList({ data }: { data: FullTransaction[] }) {
     
     return (
         <Card>
-            <DataTable value={data} tableStyle={{ minWidth: '50rem' }} paginator rows={10}>
+            <DataTable value={data} tableStyle={{ minWidth: '50rem' }} paginator rows={10} emptyMessage={"No transaction yet."}>
                 <Column sortable body={dateBody} header="Date" />
                 <Column sortable body={timeBody} header="Time" />
                 <Column body={addressBody} header="Address" />

@@ -13,9 +13,18 @@ export default async function UserPage({ params }: { params: { userId: string } 
 
         const transactions = await prisma.transaction.findMany({
             where: { user_id: userId },
-            include: {
-                version: true
-            }
+            include: { 
+                version: {
+                    include: {
+                        cluster: {
+                            select: {
+                                address: true,
+                                road: true
+                            }
+                        }
+                    }
+                }
+            },
         })
 
         if (!userInfo || !transactions) {
