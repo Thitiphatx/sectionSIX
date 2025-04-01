@@ -49,6 +49,7 @@ export default function ResourceImportForm() {
                 const rows = text.trim().split("\n");
                 const data = rows.slice(1).map((line) => {
                     const [id, image_name, time, X, Y] = line.split(",");
+                    console.log(id);
                     const [lon, lat] = Convert_XYZ(parseFloat(X), parseFloat(Y));
                     return {
                         latitude: lat,

@@ -4,11 +4,7 @@ import prisma from '@/libs/prisma'
 import { notFound } from 'next/navigation'
 import { Card } from 'primereact/card'
 
-interface PageProps {
-    params: { clusterId: string }
-}
-
-export default async function ClusterVersionsPage({ params }: PageProps) {
+export default async function ClusterVersionsPage({ params }: { params: Promise<{ clusterId: string }> }) {
     const { clusterId } = await params
     const clusterVersions = await prisma.clusters.findUnique({
         where: {

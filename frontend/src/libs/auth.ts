@@ -1,7 +1,7 @@
 import prisma from "@/libs/prisma";
-import NextAuth, { AuthError, DefaultSession, NextAuthConfig } from "next-auth";
+import NextAuth, { DefaultSession, NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { JWT } from "next-auth/jwt";
+import "next-auth/jwt";
 import { compare } from "bcryptjs";
 import { signInSchema } from "./zod/zod";
 
@@ -46,6 +46,7 @@ const authConfig: NextAuthConfig = {
                     // Fetch user from the database
                     user = await prisma.users.findFirst({ where: { email } });
                 } catch (error) {
+                    console.log(error);
                     return null
                 }
 

@@ -53,8 +53,8 @@ export default function ProfileInfoPanel() {
                 detail: 'Profile updated successfully!',
                 life: 3000
             });
-        } catch (error: any) {
-
+        } catch (error) {
+            console.log(error);
             // If error occurs, set the global error message to display
             setError("root", {
                 message: "error"

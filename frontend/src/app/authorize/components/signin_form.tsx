@@ -2,15 +2,16 @@
 
 import { Button } from "primereact/button"
 import { InputText } from "primereact/inputtext"
-import Image from "next/image"
 import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { signInSchema } from "@/libs/zod/zod"
 import { z } from "zod"
 import { handleCredentialsSignin } from "../utils/actions"
+import { useRouter } from "next/navigation"
 
 export default function SigninForm() {
+    const router = useRouter();
     const { register, handleSubmit, setError, formState: { errors, isSubmitting } } = useForm<z.infer<typeof signInSchema>>({
         resolver: zodResolver(signInSchema),
         defaultValues: {
@@ -23,12 +24,15 @@ export default function SigninForm() {
         try {
             // Make sure this function is implemented properly to handle the signin logic
             const result = await handleCredentialsSignin(values);
-
+            if (!result.message) {
+                router.push("/");
+            }
             // Handle successful sign in or redirect here
             setError("root", {
                 message: result?.message
             });
-        } catch (error: any) {
+        } catch (error) {
+            console.log(error);
             // If error occurs, set the global error message to display
             setError("root", {
                 message: "error"
@@ -44,7 +48,7 @@ export default function SigninForm() {
                         <form onSubmit={handleSubmit(onSubmit)}>
                             <div className="text-center mb-5">
                                 <div className="text-900 text-3xl font-medium mb-3">Welcome Back</div>
-                                <span className="text-600 font-medium line-height-3">Don't have an account?</span>
+                                <span className="text-600 font-medium line-height-3">Do not have an account?</span>
                                 <Link className="font-medium no-underline ml-2 cursor-pointer" style={{ color: "var(--primary-color)" }} href="/authorize/signup">Create today!</Link>
                             </div>
 

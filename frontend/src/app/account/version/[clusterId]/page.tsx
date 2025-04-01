@@ -2,10 +2,10 @@ import VersionList from '@/components/dashboard/cluster/versionList'
 import { auth } from '@/libs/auth'
 import prisma from '@/libs/prisma'
 import { notFound } from 'next/navigation'
-import { Button } from 'primereact/button'
-import { Card } from 'primereact/card'
 
-export default async function VersionsPage({ params }: { params: { clusterId: string } }) {
+export default async function VersionsPage({ params }: { params: Promise<{ clusterId: string }> }) {
+    if (!params) return notFound();
+
     const { clusterId } = await params
     const session = await auth();
 

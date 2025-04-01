@@ -1,6 +1,5 @@
 "use client"
 import Image from "next/image";
-import { Tag } from "primereact/tag";
 import Link from "next/link";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { BrowseItem } from "@/types/browse";

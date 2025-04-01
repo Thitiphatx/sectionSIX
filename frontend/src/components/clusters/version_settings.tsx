@@ -35,6 +35,7 @@ export default function VersionSettings() {
                 life: 3000
             });
         } catch (error) {
+            console.log(error);
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
@@ -103,7 +104,7 @@ export default function VersionSettings() {
                                     <div className="flex items-center">
                                         <i className="pi pi-exclamation-triangle mr-2 text-yellow-600"></i>
                                         <p className="text-yellow-600 text-sm">
-                                            Please upload images and process the segmentation first before enabling "On Sell" status.
+                                            Please upload images and process the segmentation first before enabling <b>On Sell</b> status.
                                         </p>
                                     </div>
                                 </div>

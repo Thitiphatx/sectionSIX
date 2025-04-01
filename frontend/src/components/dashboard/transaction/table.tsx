@@ -4,65 +4,54 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
-import { FilterMatchMode } from 'primereact/api';
 import { Dropdown } from 'primereact/dropdown';
 import { Calendar } from 'primereact/calendar';
 import { Tag } from 'primereact/tag';
 import { Toast } from 'primereact/toast';
-import { ProgressSpinner } from 'primereact/progressspinner';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
+import { Nullable } from 'primereact/ts-helpers';
+import { Prisma, TransactionStatus } from '@prisma/client';
+import { FloatLabel } from 'primereact/floatlabel';
+import TransactionDetailModal from './detail';
 
 // Type definitions based on your Prisma schema
-type Transaction = {
-    id: string;
-    user_id: string;
-    user: {
-        name: string;
-        email: string;
+// export type Transaction = {
+//     id: string;
+//     user_id: string;
+//     user: {
+//         name: string;
+//         email: string;
+//     };
+//     version_id: string;
+//     version: {
+//         version: number;
+//         cluster: {
+//             name: string;
+//         };
+//     };
+//     purchase_date: Date;
+//     price: number;
+//     status: 'SUCCESS' | 'FAILED';
+// };
+
+export type TransactionDetail = Prisma.TransactionGetPayload<{
+    include: {
+        user: true,
+        version: {
+            include: {
+                cluster: true
+            }
+        }
     };
-    version_id: string;
-    version: {
-        version: number;
-        cluster: {
-            name: string;
-        };
-    };
-    purchase_date: Date;
-    price: number;
-    status: 'SUCCESS' | 'FAILED';
-};
+}>;
 
-type TransactionFilters = {
-    status: 'SUCCESS' | 'FAILED' | 'ALL';
-    dateRange: [Date | null, Date | null];
-    userId?: string;
-    clusterId?: string;
-    search: string;
-};
-
-interface TransactionTableProps {
-    defaultPageSize?: number;
-}
-
-const TransactionTable: React.FC<TransactionTableProps> = ({ defaultPageSize = 10 }) => {
-    const [transactions, setTransactions] = useState<Transaction[]>([]);
+export default function TransactionTable() {
+    const [transactions, setTransactions] = useState<TransactionDetail[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    const [totalRecords, setTotalRecords] = useState<number>(0);
-    const [lazyParams, setLazyParams] = useState({
-        first: 0,
-        rows: defaultPageSize,
-        page: 0,
-        sortField: 'purchase_date',
-        sortOrder: -1
-    });
-
-    const [filters, setFilters] = useState<TransactionFilters>({
-        status: 'ALL',
-        dateRange: [null, null],
-        search: ''
-    });
-
+    const [dates, setDates] = useState<Nullable<(Date | null)[]>>(null);
+    const [search, setSearch] = useState<string>("");
+    const [status, setStatus] = useState<TransactionStatus | "ALL">("ALL");
     const toast = useRef<Toast>(null);
 
     // Status options for dropdown
@@ -72,155 +61,69 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ defaultPageSize = 1
         { label: 'Failed', value: 'FAILED' }
     ];
 
+    useEffect(() => {
+        const filter = {
+            search: search,
+            startDate: dates ? dates[0] : null,
+            endDate: dates ? dates[1] : null,
+            status: status
+        }
+
+        const queryString = new URLSearchParams({
+            ...(filter.status !== 'ALL' && { status: filter.status }),
+            ...(filter.search && { search: filter.search }),
+            ...(filter.startDate && { startDate: filter.startDate.toISOString() }),
+            ...(filter.endDate && { endDate: filter.endDate.toISOString() })
+        })
+        // console.log(queryString.toString())
+        fetchTransactions(queryString);
+    }, [dates, search, status])
+
+    const fetchTransactions = async (queryString?: URLSearchParams) => {
+        try {
+            setLoading(true);
+            // Replace with your actual API endpoint
+            const response = await fetch(`/api/getTransaction${queryString ? `?${queryString.toString()}` : ""}`);
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch transaction data');
+            }
+
+            const data = await response.json();
+
+            // Handle the case where transactions might be null
+            setTransactions(data.transactions || []);
+        } catch (error) {
+            console.error('Error fetching transactions:', error);
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'No transactions data',
+                life: 3000
+            });
+            // Reset data on error
+            setTransactions([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     // Load transactions based on pagination and filters
     useEffect(() => {
-        const fetchTransactions = async () => {
-            try {
-                setLoading(true);
-
-                // Build query params for API call
-                const queryParams = new URLSearchParams({
-                    page: lazyParams.page.toString(),
-                    pageSize: lazyParams.rows.toString(),
-                    sortField: lazyParams.sortField,
-                    sortOrder: lazyParams.sortOrder.toString(),
-                    ...(filters.status !== 'ALL' && { status: filters.status }),
-                    ...(filters.search && { search: filters.search }),
-                    ...(filters.userId && { userId: filters.userId }),
-                    ...(filters.clusterId && { clusterId: filters.clusterId }),
-                    ...(filters.dateRange[0] && { startDate: filters.dateRange[0].toISOString() }),
-                    ...(filters.dateRange[1] && { endDate: filters.dateRange[1].toISOString() })
-                });
-
-                // Replace with your actual API endpoint
-                const response = await fetch(`/api/getTransaction?${queryParams.toString()}`);
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch transaction data');
-                }
-
-                const data = await response.json();
-
-                // Handle the case where transactions might be null
-                setTransactions(data.transactions || []);
-                setTotalRecords(data.totalCount || 0);
-
-                // If we get zero records but we're not on the first page, go back to first page
-                if (data.totalCount === 0 && lazyParams.page > 0) {
-                    setLazyParams({
-                        ...lazyParams,
-                        first: 0,
-                        page: 0
-                    });
-                }
-            } catch (error) {
-                // console.error('Error fetching transactions:', error);
-                toast.current?.show({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: 'No transactions data',
-                    life: 3000
-                });
-                // Reset data on error
-                setTransactions([]);
-                setTotalRecords(0);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchTransactions();
-    }, [lazyParams, filters]);
-
-    // Handle page change
-    const onPage = (event: any) => {
-        setLazyParams({
-            ...lazyParams,
-            first: event.first,
-            page: event.page,
-            rows: event.rows
-        });
-    };
-
-    // Handle sort change
-    const onSort = (event: any) => {
-        setLazyParams({
-            ...lazyParams,
-            sortField: event.sortField,
-            sortOrder: event.sortOrder
-        });
-    };
-
-    // Handle filter status change
-    const onStatusChange = (e: any) => {
-        setFilters({
-            ...filters,
-            status: e.value
-        });
-        // Reset to first page when filter changes
-        setLazyParams({
-            ...lazyParams,
-            first: 0,
-            page: 0
-        });
-    };
-
-    // Handle date range change
-    const onDateRangeChange = (dates: [Date | null, Date | null]) => {
-        setFilters({
-            ...filters,
-            dateRange: dates
-        });
-        // Reset to first page when filter changes
-        setLazyParams({
-            ...lazyParams,
-            first: 0,
-            page: 0
-        });
-    };
-
-    // Handle search input change
-    const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFilters({
-            ...filters,
-            search: e.target.value
-        });
-        // Reset to first page when search changes
-        setLazyParams({
-            ...lazyParams,
-            first: 0,
-            page: 0
-        });
-    };
-
-    // Clear all filters
-    const clearFilters = () => {
-        setFilters({
-            status: 'ALL',
-            dateRange: [null, null],
-            search: '',
-            userId: undefined,
-            clusterId: undefined
-        });
-        // Reset to first page
-        setLazyParams({
-            ...lazyParams,
-            first: 0,
-            page: 0
-        });
-    };
+    }, []);
 
     // Format price as currency
-    const priceTemplate = (rowData: Transaction) => {
-        return new Intl.NumberFormat('en-US', {
+    const priceTemplate = (rowData: TransactionDetail) => {
+        return new Intl.NumberFormat('th-TH', {
             style: 'currency',
-            currency: 'USD'
+            currency: 'THB'
         }).format(rowData.price);
     };
 
     // Format date
-    const dateTemplate = (rowData: Transaction) => {
-        return new Date(rowData.purchase_date).toLocaleDateString('en-US', {
+    const dateTemplate = (rowData: TransactionDetail) => {
+        return new Date(rowData.purchase_date).toLocaleDateString('th-TH', {
             year: 'numeric',
             month: 'short',
             day: 'numeric',
@@ -229,8 +132,14 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ defaultPageSize = 1
         });
     };
 
+    const clearFilters = () => {
+        setDates(null)
+        setSearch("")
+        setStatus("ALL")
+    }
+
     // Status badge
-    const statusTemplate = (rowData: Transaction) => {
+    const statusTemplate = (rowData: TransactionDetail) => {
         const severity = rowData.status === 'SUCCESS' ? 'success' : 'danger';
         return <Tag severity={severity} value={rowData.status} />;
     };
@@ -241,7 +150,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ defaultPageSize = 1
             <div className="flex flex-col items-center justify-center py-8">
                 <i className="pi pi-search text-gray-400 text-5xl mb-4"></i>
                 <p className="text-xl text-gray-500 mb-2">No transactions found</p>
-                <p className="text-gray-400 mb-4">
+                {/* <p className="text-gray-400 mb-4">
                     {filters.search || filters.status !== 'ALL' || filters.dateRange[0] || filters.dateRange[1] ?
                         'Try adjusting your filters' :
                         'There are no transactions in the system yet'}
@@ -253,48 +162,77 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ defaultPageSize = 1
                         className="p-button-outlined"
                         onClick={clearFilters}
                     />
-                )}
+                )} */}
             </div>
         );
     };
+    const [selectedTransaction, setSelectedTransaction] = useState<TransactionDetail | null>(null);
+    const [modalVisible, setModalVisible] = useState<boolean>(false);
 
+    // Function to open the modal with a specific transaction
+    const openTransactionModal = (transaction: TransactionDetail) => {
+        setSelectedTransaction(transaction);
+        setModalVisible(true);
+    };
+
+    // Function to close the modal
+    const closeTransactionModal = () => {
+        setModalVisible(false);
+    };
+
+    // Modify the Actions column in your DataTable to use this function
+    const actionBodyTemplate = (rowData: TransactionDetail) => (
+        <div className="flex gap-2">
+            <Button
+                icon="pi pi-eye"
+                className="p-button-rounded p-button-text p-button-sm"
+                tooltip="View Details"
+                tooltipOptions={{ position: 'top' }}
+                onClick={() => openTransactionModal(rowData)}
+            />
+        </div>
+    );
     return (
         <div className="card">
             <Toast ref={toast} />
 
             {/* Filters section */}
-            <div className="flex flex-col md:flex-row gap-4 mb-4 p-4 bg-gray-50 rounded-lg">
+            <div className="flex flex-col md:flex-row gap-4 mb-4 p-5 pt-10 bg-gray-50 rounded-lg">
                 <div className="w-full md:w-1/4">
                     <IconField iconPosition="left">
                         <InputIcon className="pi pi-search"> </InputIcon>
                         <InputText
                             className="w-full"
                             placeholder="Search"
-                            value={filters.search}
-                            onChange={onSearchChange}    
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
                         />
                     </IconField>
                 </div>
 
                 <div className="w-full md:w-1/4">
                     <Dropdown
-                        value={filters.status}
+                        value={status}
                         options={statusOptions}
-                        onChange={onStatusChange}
+                        onChange={(e) => setStatus(e.value)}
                         placeholder="Filter by Status"
                         className="w-full"
                     />
                 </div>
 
                 <div className="w-full md:w-1/3">
-                    <Calendar
-                        value={filters.dateRange as any}
-                        onChange={(e) => onDateRangeChange(e.value as [Date | null, Date | null])}
-                        selectionMode="range"
-                        readOnlyInput
-                        placeholder="Date Range"
-                        className="w-full"
-                    />
+                    <FloatLabel>
+                        <Calendar
+                            inputId='range'
+                            value={dates}
+                            dateFormat='dd/mm/yy'
+                            onChange={(e) => setDates(e.value)}
+                            selectionMode="range"
+                            readOnlyInput
+                            hideOnRangeSelection
+                        />
+                        <label htmlFor="range">Date range</label>
+                    </FloatLabel>
                 </div>
 
                 <div className="w-full md:w-auto flex justify-end">
@@ -310,71 +248,44 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ defaultPageSize = 1
             {/* Data table */}
             <DataTable
                 value={transactions}
-                lazy
                 paginator
-                first={lazyParams.first}
-                rows={lazyParams.rows}
-                totalRecords={totalRecords}
-                onPage={onPage}
-                onSort={onSort}
-                sortField={lazyParams.sortField}
+                rows={10}
+                size='small'
                 loading={loading}
                 emptyMessage={emptyMessageTemplate}
-                className="p-datatable-sm"
-                responsiveLayout="scroll"
                 rowHover
                 stripedRows
             >
-                <Column field="id" header="Transaction ID" sortable style={{ width: '8%' }} />
-                <Column field="user.name" header="Customer" sortable style={{ width: '15%' }} />
-                <Column field="version.cluster.name" header="Cluster" sortable style={{ width: '15%' }} />
-                <Column field="version.version" header="Version" sortable style={{ width: '8%' }} />
+                <Column field="id" header="Transaction ID" style={{ width: "21%" }} />
+                <Column field="user.name" header="Customer" />
+                <Column field="version.cluster.name" header="Cluster" />
+                <Column field="version.version" header="Version" />
                 <Column
                     field="purchase_date"
                     header="Date"
                     body={dateTemplate}
-                    sortable
-                    style={{ width: '18%' }}
+                    style={{ width: "12%" }}
                 />
                 <Column
                     field="price"
                     header="Amount"
                     body={priceTemplate}
-                    sortable
-                    style={{ width: '12%' }}
                 />
                 <Column
                     field="status"
                     header="Status"
                     body={statusTemplate}
-                    sortable
-                    style={{ width: '12%' }}
                 />
                 <Column
                     header="Actions"
-                    body={(rowData) => (
-                        <div className="flex gap-2">
-                            <Button
-                                icon="pi pi-eye"
-                                className="p-button-rounded p-button-text p-button-sm"
-                                tooltip="View Details"
-                                tooltipOptions={{ position: 'top' }}
-                                onClick={() => console.log('View details for:', rowData.id)}
-                            />
-                            <Button
-                                icon="pi pi-download"
-                                className="p-button-rounded p-button-text p-button-sm"
-                                tooltip="Download Receipt"
-                                tooltipOptions={{ position: 'top' }}
-                                onClick={() => console.log('Download receipt for:', rowData.id)}
-                            />
-                        </div>
-                    )}
-                    style={{ width: '12%' }}
+                    body={actionBodyTemplate}
                 />
             </DataTable>
+            <TransactionDetailModal
+                transaction={selectedTransaction}
+                visible={modalVisible}
+                onHide={closeTransactionModal}
+            />
         </div>
     );
 };
-
-export default TransactionTable;

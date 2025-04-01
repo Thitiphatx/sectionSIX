@@ -1,8 +1,7 @@
 "use client"
-
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card } from "primereact/card"
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import BrowseSearch from "../../browse/search";
 import Image from "next/image";
 import { Tag } from "primereact/tag";
@@ -13,8 +12,8 @@ import { BrowseItem } from "@/types/browse";
 import { getMyCluster } from "@/features/account/getMycluster";
 import { useSession } from "next-auth/react";
 
-
-export default function ClusterList() {
+// Content component that uses searchParams
+function ClusterListContent() {
     const [clusterData, setClusterData] = useState<BrowseItem[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const searchParams = useSearchParams();
@@ -24,17 +23,14 @@ export default function ClusterList() {
     useEffect(() => {
         const query = searchParams.get("s") || "";
         handleSearch(query);
-    }, [session])
+    }, [searchParams])
 
     async function handleSearch(query: string) {
         setLoading(true);
-
         // Update the URL (without reloading the page)
-        router.push(`?s=${query}`, { scroll: false });
-
+        router.push(`?s=${query}`, { scroll: true });
         // Fetch data from the server
-        let result = await getMyCluster(query, session?.user.id ?? "");
-
+        const result = await getMyCluster(query, session?.user.id ?? "");
         setClusterData(result);
         setLoading(false);
     }
@@ -45,7 +41,6 @@ export default function ClusterList() {
             <Card>
                 <BrowseSearch onSearch={handleSearch} defaultQuery={searchParams.get("s") || ""} />
             </Card>
-
             {/* grid */}
             <Card className="p-4" pt={{ content: { className: "space-y-4" } }}>
                 <h1 className="text-xl font-bold">All address ({clusterData.length})</h1>
@@ -88,3 +83,27 @@ export default function ClusterList() {
     )
 }
 
+// Main component with Suspense
+export default function ClusterList() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen w-full bg-zinc-100 p-4 space-y-2">
+                {/* Search fallback */}
+                <Card>
+                    <div className="h-12 animate-pulse bg-gray-200 rounded"></div>
+                </Card>
+                {/* Grid fallback */}
+                <Card className="p-4">
+                    <h1 className="text-xl font-bold">All address</h1>
+                    <div className="grid lg:grid-cols-3 grid-cols-1 gap-2 mt-4">
+                        {[...Array(6)].map((_, i) => (
+                            <div key={i} className="rounded-xl h-64 animate-pulse bg-gray-200"></div>
+                        ))}
+                    </div>
+                </Card>
+            </div>
+        }>
+            <ClusterListContent />
+        </Suspense>
+    );
+}

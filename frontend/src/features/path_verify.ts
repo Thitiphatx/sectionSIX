@@ -7,7 +7,7 @@ export async function path_verify(path: string) {
         await fs.mkdir(path, { recursive: true });
         return true;
     } catch (error) {
-        console.error(`Error creating path`);
+        console.log(error);
         return false;
     }
 }

@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Tag } from "primereact/tag";
 import { DataView } from "primereact/dataview";
-import Image from "next/image";
 import { Button } from "primereact/button";
 import { resourceStatusColor } from "@/features/resources/resource_status_color";
 import { Card } from "primereact/card";

@@ -1,7 +1,7 @@
 "use client"
 
-import { ClusterWithImage, ClusterWithVersion } from "@/types/clusters";
-import { createContext, Dispatch, SetStateAction, useContext } from "react";
+import { ClusterWithVersion } from "@/types/clusters";
+import { createContext, useContext } from "react";
 
 export const ClusterContext = createContext<ClusterWithVersion | undefined>(undefined); 
 

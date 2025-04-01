@@ -29,6 +29,7 @@ export const resizeImage = async (file: File) => {
 
               resolve(resizedFile);
             } catch (error) {
+              console.log(error);
               reject(new Error('Error resizing the image.'));
             }
           } else if (result instanceof Blob) {

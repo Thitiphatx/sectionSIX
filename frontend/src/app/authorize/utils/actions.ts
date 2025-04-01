@@ -1,11 +1,11 @@
 "use server"
 
 import prisma from "../../../libs/prisma"
-import { SigninFormSchema, SignupFormSchema } from "./schema"
+import { SignupFormSchema } from "./schema"
 import { hashSync } from "bcryptjs"
 import { signIn, signOut } from "@/libs/auth"
 import { AuthError } from "next-auth"
-import { redirect, RedirectType } from "next/navigation"
+import { redirect } from "next/navigation"
 
 
 interface credentialsProp {
@@ -20,7 +20,7 @@ interface signUpCredentialsProp extends credentialsProp {
 export async function handleCredentialsSignin({ email, password }: credentialsProp) {
     try {
         await signIn("credentials", { email, password, redirect: false },);
-        redirect("/", RedirectType.push);
+        redirect("/");
     } catch (error) {
         if (error instanceof AuthError) {
             switch (error.type) {
@@ -58,6 +58,7 @@ export async function handleSignup({ name, email, password }: signUpCredentialsP
             }
         }
     } catch (error) {
+        console.log(error);
         return {
             message: "Database is offline"
         }
@@ -74,6 +75,7 @@ export async function handleSignup({ name, email, password }: signUpCredentialsP
             }
         })
     } catch (error) {
+        console.log(error);
         return {
             message: "Database is offline"
         }
@@ -99,92 +101,92 @@ export async function handleSignup({ name, email, password }: signUpCredentialsP
     }
 }
 
-export async function SignUpAction(prevState: any, formData: FormData) {
-    const data = {
-        name: formData.get("name"),
-        email: formData.get("email"),
-        password: formData.get("password")
-    }
-    const validationResult = SignupFormSchema.safeParse({
-        name: data.name,
-        email: data.email,
-        password: data.password
-    })
+// export async function SignUpAction(prevState: string, formData: FormData) {
+//     const data = {
+//         name: formData.get("name"),
+//         email: formData.get("email"),
+//         password: formData.get("password")
+//     }
+//     const validationResult = SignupFormSchema.safeParse({
+//         name: data.name,
+//         email: data.email,
+//         password: data.password
+//     })
 
-    if (!validationResult.success) {
-        return {
-            ...prevState,
-            data,
-            errors: validationResult.error.flatten().fieldErrors,
-            success: false
-        }
-    }
-    const email = formData.get("email") as string;
-    let existingUser;
-    try {
-        existingUser = await prisma.users.findFirst({
-            where: {
-                email: email
-            }
-        })
-    } catch (error) {
-        console.log(error);
-    }
+//     if (!validationResult.success) {
+//         return {
+//             ...prevState,
+//             data,
+//             errors: validationResult.error.flatten().fieldErrors,
+//             success: false
+//         }
+//     }
+//     const email = formData.get("email") as string;
+//     let existingUser;
+//     try {
+//         existingUser = await prisma.users.findFirst({
+//             where: {
+//                 email: email
+//             }
+//         })
+//     } catch (error) {
+//         console.log(error);
+//     }
 
-    if (existingUser) {
-        return {
-            ...prevState,
-            data,
-            errors: {
-                email: ["This email is already in use."],
-            },
-        };
-    };
+//     if (existingUser) {
+//         return {
+//             ...prevState,
+//             data,
+//             errors: {
+//                 email: ["This email is already in use."],
+//             },
+//         };
+//     };
 
-    const name = formData.get("name") as string;
-    const rawPassword = formData.get("password") as string;
+//     const name = formData.get("name") as string;
+//     const rawPassword = formData.get("password") as string;
 
-    const password = await hashSync(rawPassword, 10);
-    await prisma.users.create({
-        data: {
-            name,
-            email,
-            password,
-            created_at: new Date()
-        }
-    })
+//     const password = await hashSync(rawPassword, 10);
+//     await prisma.users.create({
+//         data: {
+//             name,
+//             email,
+//             password,
+//             created_at: new Date()
+//         }
+//     })
 
-    return {
-        ...prevState,
-        data,
-        errors: null,
-        message: null,
-        success: true
-    }
-}
+//     return {
+//         ...prevState,
+//         data,
+//         errors: null,
+//         message: null,
+//         success: true
+//     }
+// }
 
-export async function SignInAction(prevState: any, formData: FormData) {
-    const data = {
-        email: formData.get("email"),
-        password: formData.get("password")
-    }
-    const validationResult = SigninFormSchema.safeParse({
-        email: data.email,
-        password: data.password
-    })
+// export async function SignInAction(prevState: any, formData: FormData) {
+//     const data = {
+//         email: formData.get("email"),
+//         password: formData.get("password")
+//     }
+//     const validationResult = SigninFormSchema.safeParse({
+//         email: data.email,
+//         password: data.password
+//     })
 
-    if (!validationResult.success) {
-        return {
-            ...prevState,
-            data,
-            errors: validationResult.error.flatten().fieldErrors
-        }
-    }
-    return {
-        ...prevState,
-        errors: null,
-        data,
-        message: null,
-        success: true
-    }
-}
+//     if (!validationResult.success) {
+//         return {
+//             ...prevState,
+//             data,
+//             errors: validationResult.error.flatten().fieldErrors
+//         }
+//     }
+//     return {
+//         ...prevState,
+//         errors: null,
+//         data,
+//         message: null,
+//         success: true
+//     }
+// }

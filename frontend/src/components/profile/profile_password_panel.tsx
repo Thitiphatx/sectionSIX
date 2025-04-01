@@ -2,8 +2,6 @@
 
 import { Button } from "primereact/button"
 import { Card } from "primereact/card"
-import { Password } from "primereact/password"
-import { Message } from "primereact/message"
 import { useProfileContext } from "@/contexts/profileContext"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -38,6 +36,7 @@ export default function ProfilePasswordPanel() {
                 setError("root", { message: result?.message || "Unknown error" });
             }
         } catch (error) {
+            console.log(error);
             setError("root", { message: "An unexpected error occurred." });
         }
     };

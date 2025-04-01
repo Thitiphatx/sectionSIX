@@ -116,7 +116,7 @@ export default function ResourceCluster() {
             <Card className="shadow-md border border-gray-100 rounded-lg" header={header}>
                 <div className="mb-4">
                     <Message
-                        severity={resourceStatusColor(data.status) as any}
+                        severity={resourceStatusColor(data.status) as "error" | "success" | "info" | "warn" | "secondary" | "contrast" | undefined}
                         className="w-full mb-4"
                         content={
                             <span className="font-medium mb-1 flex items-center gap-2">Resource Status: <Tag severity={resourceStatusColor(data.status)}>{data.status}</Tag></span>

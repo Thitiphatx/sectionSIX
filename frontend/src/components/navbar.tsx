@@ -1,60 +1,31 @@
-"use client"
+"use server"
 
-import { signOut, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { auth } from "@/libs/auth";
+import Link from "next/link"
 import { Button } from "primereact/button";
-import { Menu } from "primereact/menu";
-import { Menubar } from 'primereact/menubar';
-import { useRef } from "react";
+import UserMenu from "./userMenu";
 
-export default function Navbar() {
-    const { data: session } = useSession();
-    const menuRight = useRef<Menu>(null);
-    const router = useRouter();
-
-    const items = [
-        {
-            label: 'Section6',
-            url: '/',
-        },
-        {
-            label: 'Browse',
-            url: '/browse',
-        },
-        {
-            label: 'Pricing',
-            url: '/',
-        }
-    ];
-
-    const profileItems = [
-        {
-            label: 'Profile',
-            url: '/account/profile'
-        },
-        {
-            label: 'Dashboard',
-            url: '/dashboard'
-        },
-        {
-            label: 'Signout',
-            command: () => signOut()
-        },
-    ]
-    const end = (
-        <div>
-
-            {!session?.user.id ? (
-                <Button label="Signin" onClick={() => router.push("/authorize/signin")} />
-            ) : (
-                <>
-                    <Menu model={profileItems} ref={menuRight} popup popupAlignment="right" />
-                    <Button label={session.user.name ?? ""} onClick={(event) => menuRight?.current?.toggle(event)} outlined rounded/>
-                </>
-            )}
-        </div>
-    )
+export default async function Navbar() {
+    const session = await auth();
     return (
-        <Menubar model={items} end={end} />
+        <div className="bg-zinc-100 border-b-2 flex flex-row justify-between items-center p-2">
+            <div className="flex flex-row items-center gap-5">
+                <Link href="/" passHref>
+                    <Button severity="secondary" text label="Section6"/>
+                </Link>
+                <Link href="/browse?s=" passHref>
+                    <Button severity="secondary" text label="Browse"/>
+                </Link>
+            </div>
+            <div>
+                {session?.user.id ? (
+                    <UserMenu session={session} />
+                ) : (
+                    <Link href="/authorize/signin" passHref>
+                        <Button label="Signin"/>
+                    </Link>
+                )}
+            </div>
+        </div>
     )
 }

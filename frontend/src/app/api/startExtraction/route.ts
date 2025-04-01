@@ -185,7 +185,7 @@ const getClusterVersion = async (clusterId: string) => {
             }
         });
     } else {
-        let newVersionNum = Math.max(...versions.map(v => v.version)) + 1;
+        const newVersionNum = Math.max(...versions.map(v => v.version)) + 1;
         newVersion = await prisma.clusterVersions.create({
             data: {
                 cluster_id: clusterId,

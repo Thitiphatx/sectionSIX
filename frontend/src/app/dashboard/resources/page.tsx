@@ -19,6 +19,7 @@ export default async function Page() {
             </div>
         )
     } catch (error) {
+        console.log(error);
         return (
             <div>
                 <ErrorPage message="Database is offline"/>

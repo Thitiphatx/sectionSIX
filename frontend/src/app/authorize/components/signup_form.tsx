@@ -28,8 +28,8 @@ export default function SignupForm() {
             setError("root", {
                 message: result?.message
             });
-        } catch (error: any) {
-            // If error occurs, set the global error message to display
+        } catch (error) {
+            console.log(error);
             setError("root", {
                 message: "error"
             })

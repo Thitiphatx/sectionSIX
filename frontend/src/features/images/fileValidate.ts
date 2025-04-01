@@ -18,13 +18,13 @@ export async function fileValidate(clusterId: string, versionId: string) {
             }
         })
 
-        let updates = [];
+        const updates = [];
 
         for (const image of images) {
             const imagePath = path.join(process.cwd(), '../storage/clusters', clusterId, 'versions', versionId, 'images', image.file_name);
             console.log(imagePath);
 
-            let status: ImageStatus = (fs.existsSync(imagePath)) ? "AVAILABLE" : "PENDING";
+            const status: ImageStatus = (fs.existsSync(imagePath)) ? "AVAILABLE" : "PENDING";
             if (image.status !== status) {
                 updates.push(prisma.images.update({
                     where: { id: image.id },

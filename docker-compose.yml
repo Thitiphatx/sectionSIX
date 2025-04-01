@@ -32,7 +32,7 @@ services:
   stripe-cli:
     image: stripe/stripe-cli
     container_name: stripe-cli
-    command: "listen --forward-to frontend:3000/api/webhook/"
+    command: "listen --forward-to frontend:3000/api/webhook/ ${wow}"
     # env_file:
     #   - stripe_cli.env
     depends_on:

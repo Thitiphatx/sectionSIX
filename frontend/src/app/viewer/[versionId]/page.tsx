@@ -5,6 +5,7 @@ import ViewerDetail from "@/components/viewer/detail";
 import { auth } from "@/libs/auth";
 import prisma from "@/libs/prisma";
 import { Prisma } from "@prisma/client";
+import { notFound } from "next/navigation";
 
 export type versionWithCluster = Prisma.ClusterVersionsGetPayload<{
     include: {
@@ -26,7 +27,8 @@ export type ImagesExport = Prisma.ImagesGetPayload<{
     }
 }>
 
-export default async function ViewerLanding({ params }: { params: { versionId: string } }) {
+export default async function ViewerLanding({ params }: { params: Promise<{ versionId: string }> }) {
+    if (!params) return notFound();
     const { versionId } = await params;
     const session = await auth();
 

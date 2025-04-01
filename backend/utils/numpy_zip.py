@@ -5,11 +5,15 @@ from mmengine.structures import PixelData
 
 
 def npztoseg(filePath):
-    result = np.load(filePath)
-    sem_seg = torch.from_numpy(result["data"])
-    gt_sem_seg_data = dict(data=sem_seg)
-    gt_sem_seg = PixelData(**gt_sem_seg_data)
+    # Memory-mapped loading for large datasets
+    with np.load(filePath, mmap_mode='r') as npz_data:
+        sem_seg = torch.from_numpy(npz_data['data'])  # Zero-copy conversion
+        
+    # Create PixelData with tensor reference
+    gt_sem_seg = PixelData(data=sem_seg)
+    
+    # Create SegDataSample with minimal overhead
     data_sample = SegDataSample()
     data_sample.gt_sem_seg = gt_sem_seg
-
+    
     return data_sample

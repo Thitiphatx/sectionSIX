@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { Divider } from 'primereact/divider';
-import { Badge } from 'primereact/badge';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Toast } from 'primereact/toast';
 import { useRef } from 'react';
@@ -14,7 +13,7 @@ const SuccessPage = () => {
     const [sessionId, setSessionId] = useState('');
     const router = useRouter();
     const [loading, setLoading] = useState(true);
-    const toast = useRef<any>(null);
+    const toast = useRef<Toast>(null);
 
     useEffect(() => {
         const sessionIdFromUrl = new URLSearchParams(window.location.search).get('session_id');
@@ -23,7 +22,7 @@ const SuccessPage = () => {
         // Simulate loading for demonstration purposes
         const timer = setTimeout(() => {
             setLoading(false);
-            toast.current.show({
+            toast?.current?.show({
                 severity: 'success',
                 summary: 'Payment Successful',
                 detail: 'Your transaction has been processed successfully!',

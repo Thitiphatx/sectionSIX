@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
@@ -69,6 +69,7 @@ export default function EditUserPage({ data }: EditUserPageProps) {
                 router.refresh();
             }
         } catch (error) {
+            console.log(error);
             setError("root", { message: "An error occurred while updating the user." });
         }
     };

@@ -1,5 +1,3 @@
-"use client"
-
 import { Users } from "@prisma/client";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
@@ -15,9 +13,20 @@ export default function UserTable() {
     const [users] = useState<Users[]>(data);
     const { data: session } = useSession();
     const router = useRouter();
+    
+    // State for copy tooltip message
+    const [copyTooltips, setCopyTooltips] = useState("copy user id");
+
+    // Function to handle copy to clipboard action
+    const copyToClip = async (userId: string) => {
+        await navigator.clipboard.writeText(userId);
+        setCopyTooltips("copied");
+        setTimeout(() => {
+            setCopyTooltips("copy user id");
+        }, 3000);
+    };
 
     const roleBodyTemplate = (user: Users) => {
-        let severity: null | "success" | "warning" | "secondary" | "info" | "danger" | "contrast";
         switch (user.role) {
             case "ADMIN":
                 return (
@@ -35,23 +44,14 @@ export default function UserTable() {
     }
 
     const manageBodyTemplate = (user: Users) => {
-        const [copyTooltips, setCopyTooltips] = useState("copy user id");
-        const copyToClip = async ()=> {
-            await navigator.clipboard.writeText(user.id)
-            setCopyTooltips("copied");
-            setTimeout(()=> {
-                setCopyTooltips("copy user id");
-            }, 3000);
-        }
         return (
             <div className="space-x-1">
                 {(session?.user.id === user.id) ? (<></>) :
                     (
-                        <Button size="small" severity="info" icon="pi pi-pen-to-square" onClick={()=> router.push(`/dashboard/users/${user.id}`)} />
+                        <Button size="small" severity="info" icon="pi pi-pen-to-square" onClick={() => router.push(`/dashboard/users/${user.id}`)} />
                     )}
-                <Button size="small" severity="secondary" icon="pi pi-clone" tooltip={copyTooltips} onClick={copyToClip}/>
-            </div >
-
+                <Button size="small" severity="secondary" icon="pi pi-clone" tooltip={copyTooltips} onClick={() => copyToClip(user.id)} />
+            </div>
         )
     }
 

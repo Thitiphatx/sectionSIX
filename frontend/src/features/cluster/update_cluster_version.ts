@@ -14,6 +14,7 @@ export default async function update_cluster_version(clusterVersionId: string, b
 
 		})
 	} catch (error) {
+		console.log(error);
 		return { message: "Database is offline" }
 	}
 }

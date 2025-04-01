@@ -12,7 +12,6 @@ import { Tag } from "primereact/tag";
 import { Toast } from "primereact/toast";
 import { ImagesExport, versionWithCluster } from "@/app/viewer/[versionId]/page";
 import ExportButton from "./exportButton";
-import { Images } from "@prisma/client";
 
 type ClassesOptions = {
 	label: string;
@@ -21,7 +20,9 @@ type ClassesOptions = {
 
 export default function ViewerDetail({ data, images }: { data: versionWithCluster, images: ImagesExport[] }) {
 	const toast = useRef<Toast>(null);
-	const [baseSrc] = useState(`${process.env.NEXT_PUBLIC_API_URL}/video/${data.cluster_id}/${data.id}`);
+	const [baseSrc] = useState(
+		data?.id ? `${process.env.NEXT_PUBLIC_API_URL}/video/${data.cluster_id}/${data.id}` : ''
+	);
 	const [showVideo, setShowVideo] = useState(true);
 	const [options, setOptions] = useState<ClassesOptions[]>([]);
 
@@ -53,7 +54,7 @@ export default function ViewerDetail({ data, images }: { data: versionWithCluste
 
 	const handleApply = () => {
 		if (selectedClasses.length < 1) {
-			toast.current?.show({severity:'error', summary: 'Error', detail:'Please select atleast 1 class', life: 3000});
+			toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Please select atleast 1 class', life: 3000 });
 			return
 		}
 		const prefix = showLabel ? "l_" : "nl_";
@@ -67,7 +68,9 @@ export default function ViewerDetail({ data, images }: { data: versionWithCluste
 			setCurrentImage('');
 			setIsLoading(true);
 
-			const eventSource = new EventSource(`${process.env.NEXT_PUBLIC_API_URL}/api/segmentation/render?clusterId=${data.cluster_id}&versionId=${data.id}&showLabel=${showLabel}&classes=${classString}`);
+			const eventSource = new EventSource(
+				`${process.env.NEXT_PUBLIC_API_URL}/api/segmentation/render?clusterId=${data?.cluster_id}&versionId=${data?.id}&showLabel=${showLabel}&classes=${classString}`
+			  );
 			eventSource.onmessage = (event) => {
 				const res = JSON.parse(event.data);
 				setRenderProgress(res.progress);
@@ -90,7 +93,7 @@ export default function ViewerDetail({ data, images }: { data: versionWithCluste
 			console.error("Error applying settings:", error);
 		}
 	}
-
+	if (!data?.id || !data?.cluster_id) return <div>Loading...</div>;
 	return (
 		<div className="max-w-screen-xl mx-auto p-4">
 			<Toast ref={toast} />
@@ -182,7 +185,7 @@ export default function ViewerDetail({ data, images }: { data: versionWithCluste
 								<div className="flex items-center">
 
 								</div>
-								<ExportButton images={images}/>
+								<ExportButton images={images} />
 							</div>
 						</div>
 					</Card>

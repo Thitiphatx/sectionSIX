@@ -6,8 +6,8 @@ import 'primeicons/primeicons.css';
 import 'primereact/resources/themes/lara-light-green/theme.css';
 
 import { SessionProvider } from "next-auth/react";
-import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
+import Navbar from "@/components/navbar";
 
 const comfortaa = Comfortaa({
 	subsets: ["latin"],

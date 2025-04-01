@@ -12,12 +12,12 @@ export const editUserSchema = object({
         .min(1, "Email is required")
         .email("Invalid email"),
     status: z.nativeEnum(UserStatus, {
-        errorMap: (issue, ctx) => {
+        errorMap: () => {
             return { message: "Invalid status selected. Must be ACTIVE or DEACTIVE." }
         }
     }),
     role: z.nativeEnum(UserRole, {
-        errorMap: (issue, ctx) => {
+        errorMap: () => {
             return { message: "Invalid role selected. Must be Admin or User." }
         }
     }),

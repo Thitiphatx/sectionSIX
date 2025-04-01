@@ -10,7 +10,8 @@ export async function uploadImage(resourceId: string, formData: FormData) {
         await fs.mkdir(uploadFolder, { recursive: true });
 
         // Iterate over formData entries to handle files
-        for (const [_, value] of formData.entries()) {
+        for (const [key, value] of formData.entries()) {
+            console.log(key)
             if (value instanceof File) {
                 const buffer = Buffer.from(await value.arrayBuffer());
                 const filename = value.name.replace(/\s+/g, "_");  // Use regex for replacing spaces

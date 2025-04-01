@@ -2,7 +2,6 @@
 
 import { ImagesExport } from "@/app/viewer/[versionId]/page";
 import { objectClasses } from "@/types/classes";
-import { Images } from "@prisma/client";
 import { MenuItem } from "primereact/menuitem";
 import { SplitButton } from "primereact/splitbutton"
 import { Toast } from "primereact/toast";

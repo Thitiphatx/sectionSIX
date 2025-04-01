@@ -1,10 +1,8 @@
 "use client"
-
 import { getClusters } from "@/features/cluster/search";
-import { Prisma } from "@prisma/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card } from "primereact/card"
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import BrowseSearch from "../../browse/search";
 import Image from "next/image";
 import { Tag } from "primereact/tag";
@@ -13,38 +11,34 @@ import Link from "next/link";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { BrowseItem } from "@/types/browse";
 
-
-export default function ClusterList() {
+// Content component that uses searchParams
+function ClusterListContent() {
     const [clusterData, setClusterData] = useState<BrowseItem[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const searchParams = useSearchParams();
     const router = useRouter();
-
+    
     useEffect(() => {
         const query = searchParams.get("s") || "";
         handleSearch(query);
     }, [])
-
+    
     async function handleSearch(query: string) {
         setLoading(true);
-
         // Update the URL (without reloading the page)
         router.push(`?s=${query}`, { scroll: false });
-
         // Fetch data from the server
-        let result = await getClusters(query, true);
-
+        const result = await getClusters(query, true);
         setClusterData(result);
         setLoading(false);
     }
-
+    
     return (
         <div className="min-h-screen w-full bg-zinc-100 p-4 space-y-2">
             {/* Search */}
             <Card>
                 <BrowseSearch onSearch={handleSearch} defaultQuery={searchParams.get("s") || ""} />
             </Card>
-
             {/* grid */}
             <Card className="p-4" pt={{ content: { className: "space-y-4" } }}>
                 <h1 className="text-xl font-bold">All address ({clusterData.length})</h1>
@@ -85,4 +79,29 @@ export default function ClusterList() {
             </Card>
         </div>
     )
+}
+
+// Main component with Suspense
+export default function ClusterList() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen w-full bg-zinc-100 p-4 space-y-2">
+                {/* Search fallback */}
+                <Card>
+                    <div className="h-12 animate-pulse bg-gray-200 rounded"></div>
+                </Card>
+                {/* Grid fallback */}
+                <Card className="p-4">
+                    <h1 className="text-xl font-bold">All address</h1>
+                    <div className="grid lg:grid-cols-3 grid-cols-1 gap-2 mt-4">
+                        {[...Array(6)].map((_, i) => (
+                            <div key={i} className="rounded-xl h-64 animate-pulse bg-gray-200"></div>
+                        ))}
+                    </div>
+                </Card>
+            </div>
+        }>
+            <ClusterListContent />
+        </Suspense>
+    );
 }

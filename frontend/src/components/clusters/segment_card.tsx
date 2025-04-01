@@ -3,7 +3,6 @@ import { Toast } from "primereact/toast";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
 import { ProgressBar } from "primereact/progressbar";
-import { Card } from "primereact/card";
 import { Message } from "primereact/message";
 import { Dialog } from "primereact/dialog";
 
@@ -63,7 +62,7 @@ export default function SegmentCard() {
                 setProgress(result.progress);
                 setCurrentImage(result.current_image);
                 
-                await saveSegmentedImage(context.Images[0].resource_id, result.current_image, result.unique_class);
+                await saveSegmentedImage(`${context.Images[0].resource_id}`, result.current_image, result.unique_class);
 
                 if (result.progress === 100) {
                     eventSource.close();

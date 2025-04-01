@@ -20,6 +20,7 @@ export const resource_status_validation = async (resourceId: string)=> {
         }
 
     } catch (error) {
+        console.log(error);
         throw new Error("Database is offline")
     }
 }

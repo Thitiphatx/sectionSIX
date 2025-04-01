@@ -11,6 +11,7 @@ export default async function Users() {
             </div>
         )
     } catch (error) {
+        console.log(error);
         return (
             <ErrorPage message="Database is offline"/>
         )

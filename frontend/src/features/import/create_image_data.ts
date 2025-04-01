@@ -21,6 +21,6 @@ export async function create_image_data(resource_id: string, image_data: ImageDa
             }))
         })
     } catch (error) {
-        console.log("create image failed");
+        console.log(error);
     }
 } 

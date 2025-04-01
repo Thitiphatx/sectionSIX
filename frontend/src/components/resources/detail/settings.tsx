@@ -18,7 +18,6 @@ export default function ResourceInfoPanel() {
     const data: Resources = useResourceContext();
     const [resourceName, setResourceName] = useState(data.name);
     const [isEditing, setIsEditing] = useState(false);
-    const [loading, setLoading] = useState(false);
     const toast = useRef<Toast>(null);
     
     const { register, handleSubmit, setError, formState: { errors, isSubmitting } } = useForm<z.infer<typeof resourceSchema>>({
@@ -30,7 +29,6 @@ export default function ResourceInfoPanel() {
     })
 
     const onSubmit = async (values: z.infer<typeof resourceSchema>) => {
-        setLoading(true);
         try {
             // Make sure this function is implemented properly to handle the signin logic
             const result = await update_resource(values);
@@ -40,7 +38,8 @@ export default function ResourceInfoPanel() {
             setError("root", {
                 message: result?.message
             });
-        } catch (error: any) {
+        } catch (error) {
+            console.log(error);
             // If error occurs, set the global error message to display
             setError("root", {
                 message: "error"
@@ -53,7 +52,6 @@ export default function ResourceInfoPanel() {
             life: 3000
         });
         setIsEditing(false);
-        setLoading(false);
     }
 
     const header = (
@@ -91,7 +89,7 @@ export default function ResourceInfoPanel() {
                                 {...register("name")}
                                 className="w-full pl-10"
                                 invalid={errors.name ? true : false}
-                                disabled={!isEditing || loading}
+                                disabled={!isEditing || isSubmitting}
                             />
                             {errors.name && <small className="p-error text-sm">{errors.name.message}</small>}
                         </div>
@@ -129,13 +127,13 @@ export default function ResourceInfoPanel() {
                                         setIsEditing(false);
                                         setResourceName(data.name);
                                     }}
-                                    disabled={loading}
+                                    disabled={isSubmitting}
                                 />
                                 <Button
                                     type="submit"
                                     label="Save Changes"
                                     icon="pi pi-check"
-                                    loading={loading}
+                                    loading={isSubmitting}
                                 />
                             </div>
                         )}

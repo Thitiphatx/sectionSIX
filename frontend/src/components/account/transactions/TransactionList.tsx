@@ -41,9 +41,9 @@ export default function TransactionList({ data }: { data: FullTransaction[] }) {
                 return (
                     <Tag severity="success">Success</Tag>
                 )
-            case "CANCELED":
+            case "FAILED":
                 return (
-                    <Tag severity="danger">Canceled</Tag>
+                    <Tag severity="danger">Failed</Tag>
                 )
         }
     };

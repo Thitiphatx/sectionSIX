@@ -48,6 +48,7 @@ export default async function editUser({ adminId, id, name, email, role, status 
         })
 
     } catch (error) {
+        console.log(error);
         return {
             message: "error"
         }

@@ -28,7 +28,10 @@ export default async function ResourcePage({ params }: ResourcePageProps) {
 			</div>
 		)
 	} catch (error) {
-		<ErrorPage message="Database is offline"/>
+		console.log(error);
+		return (
+			<ErrorPage message="Database is offline"/>
+		)
 	}
 
 }

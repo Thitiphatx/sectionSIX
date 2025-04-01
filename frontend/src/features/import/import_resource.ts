@@ -21,6 +21,7 @@ export const import_resource = async (resource: ImportResource)=> {
         await create_image_data(new_resource.id, resource.Images);
         return new_resource.id
     } catch (error) {
+        console.log(error);
         throw new Error("Database is offline");
     }
 

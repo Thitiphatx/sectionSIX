@@ -18,6 +18,6 @@ export async function update_resource({ id, name }: { id:string, name: string })
             data: { name }
         })
     } catch (error) {
-        
+        console.log(error);
     }
 }

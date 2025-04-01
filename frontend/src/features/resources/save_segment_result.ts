@@ -16,6 +16,7 @@ export const saveSegmentedImage = async (resourceId: string, imageName: string, 
             }
         })
     } catch (error) {
+        console.log(error);
         return {
             message: "Database is offline."
         }
@@ -31,6 +32,7 @@ export const saveSegmentedClass = async (versionId: string, unique_class: number
             }
         })
     } catch (error) {
+        console.log(error);
         return {
             message: "Database is offline."
         }

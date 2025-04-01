@@ -1,4 +1,3 @@
-import { Clusters } from "@prisma/client";
 
 export type BrowseItem = Prisma.ClustersGetPayload<{
     include: {

@@ -20,7 +20,7 @@ export default function ResourceDeletePanel() {
             toast.current?.show({ severity: 'info', summary: 'Confirmed', detail: 'You have accepted', life: 3000 });
             router.push("/dashboard/resources")
         } catch (error) {
-
+            console.log(error);
         }
     }
 

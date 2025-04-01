@@ -3,7 +3,7 @@ import ErrorPage from "@/components/error";
 import EditUserPage from "@/components/users/form";
 import prisma from "@/libs/prisma";
 
-export default async function UserPage({ params }: { params: { userId: string } }) {
+export default async function UserPage({ params }: { params: Promise<{ userId: string }> }) {
     const { userId } = await params;
 
     try {
@@ -42,6 +42,7 @@ export default async function UserPage({ params }: { params: { userId: string } 
         )
 
     } catch (error) {
+        console.log(error);
         return (
             <ErrorPage message="Error to access data"/>
         )

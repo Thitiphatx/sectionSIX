@@ -127,6 +127,7 @@ export default function ImageUploadForm() {
             });
             clearSelection();
         } catch (error) {
+            console.error("Upload error:", error);
             toast.current?.show({ 
                 severity: 'error', 
                 summary: 'Upload Failed', 
