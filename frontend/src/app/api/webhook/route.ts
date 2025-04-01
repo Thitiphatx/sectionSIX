@@ -3,6 +3,12 @@ import { stripe } from "@/libs/stripe"
 import { NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
 
+export const config = {
+    api: {
+        bodyParser: false, // Required for raw body parsing
+    },
+};
+
 export async function POST(req: Request) {
     const body = await req.text();
     const signature = req.headers.get('Stripe-Signature') as string;
@@ -40,5 +46,5 @@ export async function POST(req: Request) {
             }
         })
     }
-    return new NextResponse("success", { status: 200})
+    return new NextResponse("success", { status: 200 })
 }
