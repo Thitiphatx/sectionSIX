@@ -12,6 +12,7 @@ from utils.numpy_zip import npztoseg
 
 
 def renderVideo(clusterId, versionId, showLabel, classes):
+    print(f"classes: {classes}\n", flush=True)
     showLabelBool = showLabel.lower() == "true"
 
     # Model initialization with mixed precision enabled
@@ -24,9 +25,7 @@ def renderVideo(clusterId, versionId, showLabel, classes):
     model.eval()
 
     dataset_meta = model.dataset_meta
-    seg_local_visualizer = SegLocalVisualizer(
-        vis_backends=[dict(type='LocalVisBackend')],
-    )
+    seg_local_visualizer = SegLocalVisualizer()
     seg_local_visualizer.dataset_meta = dataset_meta
 
     # File setup
@@ -36,11 +35,11 @@ def renderVideo(clusterId, versionId, showLabel, classes):
         raise ValueError("No .npz files found in the output directory")
 
     prefix = "l_" if showLabelBool else "nl_"
-    video_name = prefix + classes.replace(",", "_") + ".mp4"
+    video_name = prefix + classes + ".mp4"
     video_dir = os.path.join("..", "storage", "clusters", clusterId, "versions", versionId, "videos")
     os.makedirs(video_dir, exist_ok=True)
     output_folder = os.path.join(video_dir, video_name)
-    
+    print(f"classes: {classes}\n", flush=True)
     if os.path.exists(output_folder):
         yield f"data: {{\"current_image\": \"Done\", \"progress\": 100}}\n\n"
         return
@@ -66,7 +65,8 @@ def renderVideo(clusterId, versionId, showLabel, classes):
 
     # Processing loop with optimizations
     total_frames = len(npz_files)
-    selected_classes = [int(class_id) for class_id in classes.split(',')]
+    selected_classes = [int(class_id) for class_id in classes.split('_')]
+    print(selected_classes, flush=True)
 
     try:
         for idx, npz_file in enumerate(npz_files):
@@ -82,7 +82,7 @@ def renderVideo(clusterId, versionId, showLabel, classes):
 
             image_path = os.path.join("../..", "storage", "clusters", clusterId, "versions", versionId, "images", npz_file.replace('.npz', '.jpg'))
             image = mmcv.imread(osp.join(osp.dirname(__file__), image_path), 'color')
-            image = mmcv.imresize(image, (1440, 720))
+            image = mmcv.imresize(image, (width, height))
 
             seg_local_visualizer.add_datasample(
                 name='frame',
@@ -96,13 +96,10 @@ def renderVideo(clusterId, versionId, showLabel, classes):
 
             progress = round((idx + 1) / total_frames * 100)
             yield f"data: {{\"current_image\": \"{idx}\", \"progress\": {progress}}}\n\n"
-        
-        # Final cleanup
-        stop_event.set()
-        frame_queue.join()
-        torch.cuda.empty_cache()  # Clear GPU cache
-
     finally:
-        stop_event.set()
+            stop_event.set()
+            frame_queue.join()
+            video_writer.release()
+            torch.cuda.empty_cache()
 
     yield f"data: {{\"current_image\": \"Done\", \"progress\": 100}}\n\n"

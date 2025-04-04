@@ -68,6 +68,8 @@ export default function ViewerDetail({ data, images }: { data: versionWithCluste
 			setCurrentImage('');
 			setIsLoading(true);
 
+			
+
 			const eventSource = new EventSource(
 				`${process.env.NEXT_PUBLIC_API_URL}/api/segmentation/render?clusterId=${data?.cluster_id}&versionId=${data?.id}&showLabel=${showLabel}&classes=${classString}`
 			  );

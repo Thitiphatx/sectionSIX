@@ -6,3 +6,6 @@ backend/*.mp4
 backend.zip
 /output/*
 /backend/mmsegmentation/checkpoints/*
+
+.env
+backend/libopenh264-2.5.1-linux64.7.so

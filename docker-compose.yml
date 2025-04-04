@@ -13,6 +13,7 @@ services:
     volumes:
       - ./frontend:/app/frontend
       - /app/node_modules
+      - ./storage:/app/storage
     depends_on:
       - backend
 
@@ -20,6 +21,13 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
     ports:
       - "5000:5000"
     environment:
@@ -27,12 +35,13 @@ services:
       - FLASK_DEBUG=1
     volumes:
       - ./backend:/app/backend  # Mount the local code into the container
+      - ./storage:/app/storage
     depends_on:
       - postgres
   stripe-cli:
     image: stripe/stripe-cli
     container_name: stripe-cli
-    command: "listen --forward-to http://localhost:3000/api/webhook --api-key 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"
+    command: "listen --forward-to http://localhost:3000/api/webhook --api-key ${STRIPE_API_KEY}"
     network_mode: "host"
     depends_on:
       - frontend
@@ -40,12 +49,6 @@ services:
     image: postgres:latest
     container_name: postgres
     restart: always
-    environment:
-      POSTGRES_DB: section6
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-      TZ: Asia/Bangkok
-      PGTZ: Asia/Bangkok
     ports:
       - "5432:5432"
     volumes:

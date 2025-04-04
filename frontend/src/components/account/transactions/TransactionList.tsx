@@ -31,7 +31,7 @@ export default function TransactionList({ data }: { data: FullTransaction[] }) {
     const priceBody = (data: FullTransaction) => {
         return (
             <div className="flex flex-row gap-2 items-center">
-                <p>฿{(data.price/100).toLocaleString()}</p>
+                <p>฿{(data.price).toLocaleString()}</p>
             </div>
         );
     };

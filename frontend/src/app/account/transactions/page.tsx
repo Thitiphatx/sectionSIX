@@ -43,10 +43,6 @@ export default async function Transaction() {
         },
     });
 
-    if (!data.length) {
-        return <ErrorPage message="No transactions found" />;
-    }
-
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Transaction History</h1>
