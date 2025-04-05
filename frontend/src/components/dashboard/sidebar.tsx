@@ -22,6 +22,11 @@ export default function DashboardSidebar() {
 					icon: 'pi pi-receipt',
 					url: '/dashboard/transaction'
 				},
+				{
+					label: 'api docs',
+					icon: 'pi pi-file',
+					url: '/docs'
+				},
 			]
 		},
         {

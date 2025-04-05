@@ -60,7 +60,5 @@ def stream_preview(clusterId, versionId):
     return send_file(image_path, mimetype='image/jpeg')
     
 
-
-
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
