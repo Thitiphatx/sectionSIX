@@ -20,23 +20,27 @@ jobs:
 
     - name: Install dependencies
       run: |
-        cd frontend
-        npm install  # Install the dependencies from package.json
+        cd frontend  # Change directory to 'frontend'
+        npm install  # Install dependencies in the 'frontend' directory
 
     - name: Run Next.js build
       run: |
-        npm run build  # Build the Next.js app to make sure everything works
+        cd frontend  # Change directory to 'frontend'
+        npm run build  # Build the Next.js app
 
     - name: Run tests
       run: |
+        cd frontend  # Change directory to 'frontend'
         npm run test  # Run your tests (ensure you have a test script defined in package.json)
 
     - name: Lint Code
       run: |
+        cd frontend  # Change directory to 'frontend'
         npm run lint  # Optional: run linting if you have it configured
 
     - name: Check if app is working
       run: |
+        cd frontend  # Change directory to 'frontend'
         npm run start &  # Start the app in the background
         sleep 10  # Wait for the app to start
         curl --fail http://localhost:3000 || exit 1  # Ensure the app is responding
