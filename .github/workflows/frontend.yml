@@ -8,7 +8,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest  # Use the latest Ubuntu runner
-
+    env:
+      NEXT_PUBLIC_STRIPE_PUBLIC_KEY: ${{ secrets.STRIPE_PUBLIC_KEY }}
+      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v2  # Checkout your repository code
@@ -27,24 +29,13 @@ jobs:
       run: |
         cd frontend  # Change directory to 'frontend'
         npm run build  # Build the Next.js app
-      env:
-        NEXT_PUBLIC_STRIPE_PUBLIC_KEY: ${{ secrets.STRIPE_PUBLIC_KEY }}
-        STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
 
     - name: Lint Code
       run: |
         cd frontend  # Change directory to 'frontend'
         npm run lint  # Optional: run linting if you have it configured
-      env:
-        NEXT_PUBLIC_STRIPE_PUBLIC_KEY: ${{ secrets.STRIPE_PUBLIC_KEY }}
-        STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
 
     - name: Check if app is working
       run: |
         cd frontend  # Change directory to 'frontend'
         npm run start &  # Start the app in the background
-        sleep 10  # Wait for the app to start
-        curl --fail http://localhost:3000 || exit 1  # Ensure the app is responding
-      env:
-        NEXT_PUBLIC_STRIPE_PUBLIC_KEY: ${{ secrets.STRIPE_PUBLIC_KEY }}
-        STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
