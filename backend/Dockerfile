@@ -30,7 +30,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN conda clean --all -y
 
-RUN conda install -c conda-forge opencv=4.5.5 --update-deps --no-pin --no-channel-priority
+RUN conda update -n base conda -y && \
+    conda install -c conda-forge --override-channels --no-update-deps opencv=4.5.5
 
 # Install MMCV (Ensure correct CUDA & PyTorch versions)
 RUN pip install mmcv==2.1.0 -f https://download.openmmlab.com/mmcv/dist/cu121/torch2.1/index.html

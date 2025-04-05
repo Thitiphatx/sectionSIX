@@ -15,7 +15,7 @@ jobs:
         cd ./backend
         TIMESTAMP=$(date +%s)
         IMAGE_TAG=my-image-name:$TIMESTAMP
-        docker build . --tag $IMAGE_TAG
+        docker build . --tag $IMAGE_TAG --progress=plain 2>&1 | tee build.log
         CONTAINER_ID=$(docker run -d -p 5000:5000 $IMAGE_TAG)
         sleep 10
         curl http://localhost:5000/api/segmentation/list
