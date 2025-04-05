@@ -14,3 +14,5 @@ jobs:
       run: |
         cd ./backend
         docker build . --tag my-image-name:$(date +%s)
+        IMAGE_ID=$(docker images -q my-image-name:$(date +%s))
+        docker run --rm $IMAGE_ID
