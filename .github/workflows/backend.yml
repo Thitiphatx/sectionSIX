@@ -13,6 +13,7 @@ jobs:
     - name: Change directory to ./backend and Build the Docker image
       run: |
         cd ./backend
-        docker build . --tag my-image-name:$(date +%s)
-        IMAGE_ID=$(docker images -q my-image-name:$(date +%s))
-        docker run --rm $IMAGE_ID
+        TIMESTAMP=$(date +%s)
+        IMAGE_TAG=my-image-name:$TIMESTAMP
+        docker build . --tag $IMAGE_TAG
+        docker run --rm $IMAGE_TAG
