@@ -1,0 +1,41 @@
+name: Next.js Build and Test
+
+on:
+  push:
+    branches:
+      - main  # This can be adjusted to any branch you want
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Use the latest Ubuntu runner
+    env:
+      NEXT_PUBLIC_STRIPE_PUBLIC_KEY: ${{ secrets.STRIPE_PUBLIC_KEY }}
+      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2  # Checkout your repository code
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '20'  # Adjust Node.js version as needed
+
+    - name: Install dependencies
+      run: |
+        cd frontend  # Change directory to 'frontend'
+        npm install  # Install dependencies in the 'frontend' directory
+
+    - name: Run Next.js build
+      run: |
+        cd frontend  # Change directory to 'frontend'
+        npm run build  # Build the Next.js app
+
+    - name: Lint Code
+      run: |
+        cd frontend  # Change directory to 'frontend'
+        npm run lint  # Optional: run linting if you have it configured
+
+    - name: Check if app is working
+      run: |
+        cd frontend  # Change directory to 'frontend'
+        npm run start &  # Start the app in the background
