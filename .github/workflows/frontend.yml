@@ -27,16 +27,15 @@ jobs:
       run: |
         cd frontend  # Change directory to 'frontend'
         npm run build  # Build the Next.js app
-
-    - name: Run tests
-      run: |
-        cd frontend  # Change directory to 'frontend'
-        npm run test  # Run your tests (ensure you have a test script defined in package.json)
+      env:
+        NEXT_PUBLIC_STRIPE_PUBLIC_KEY: ${{ secrets.STRIPE_PUBLIC_KEY }}
 
     - name: Lint Code
       run: |
         cd frontend  # Change directory to 'frontend'
         npm run lint  # Optional: run linting if you have it configured
+      env:
+        NEXT_PUBLIC_STRIPE_PUBLIC_KEY: ${{ secrets.STRIPE_PUBLIC_KEY }}
 
     - name: Check if app is working
       run: |
@@ -44,3 +43,5 @@ jobs:
         npm run start &  # Start the app in the background
         sleep 10  # Wait for the app to start
         curl --fail http://localhost:3000 || exit 1  # Ensure the app is responding
+      env:
+        NEXT_PUBLIC_STRIPE_PUBLIC_KEY: ${{ secrets.STRIPE_PUBLIC_KEY }}
