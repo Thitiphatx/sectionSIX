@@ -20,6 +20,7 @@ jobs:
 
     - name: Install dependencies
       run: |
+        cd frontend
         npm install  # Install the dependencies from package.json
 
     - name: Run Next.js build
