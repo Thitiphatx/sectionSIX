@@ -28,9 +28,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     dpkg-reconfigure -f noninteractive tzdata && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN conda clean --all
+RUN conda clean --all -y
 
-RUN conda install -c conda-forge opencv
+RUN conda install -c conda-forge opencv --update-deps --no-pin
 
 # Install MMCV (Ensure correct CUDA & PyTorch versions)
 RUN pip install mmcv==2.1.0 -f https://download.openmmlab.com/mmcv/dist/cu121/torch2.1/index.html
