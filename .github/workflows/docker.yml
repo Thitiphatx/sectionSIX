@@ -34,6 +34,7 @@ jobs:
         run: docker system prune -af --volumes
       - name: Build and run containers with Docker Compose
         run: |
-          docker-compose up --build --no-cache
+          docker-compose build --no-cache
+          docker-compose up
           
         
