@@ -18,6 +18,11 @@ jobs:
       NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
       AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
       AUTH_TRUST_HOST: ${{ secrets.AUTH_TRUST_HOST }}
+      POSTGRES_DB: ${ secrets.POSTGRES_DB}
+      POSTGRES_USER: ${ secrets.POSTGRES_USER}
+      POSTGRES_PASSWORD: ${ secrets.POSTGRES_PASSWORD}
+      TZ: ${ secrets.TZ}
+      PGTZ: ${ secrets.PGTZ}
 
     steps:
       - uses: actions/checkout@v3 
